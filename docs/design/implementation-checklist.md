@@ -10,33 +10,33 @@
 ### M0.1 — Wallet Setup (Days 1–2)
 
 #### Frontend Scaffold
-- [ ] Create React app with TypeScript (`npx create-react-app wallet --template typescript`)
-- [ ] Configure project structure (`src/core/`, `src/ui/`, `src/services/`)
-- [ ] Install dependencies:
-  - [ ] `@veramo/core` - DID/VC agent framework
-  - [ ] `ethers` - Ethereum utilities
-  - [ ] `jose` - JWT signing/verification
-  - [ ] `axios` - HTTP client
+- [x] Create React app with TypeScript (`npx create-react-app wallet --template typescript`)
+- [x] Configure project structure (`src/core/`, `src/ui/`, `src/services/`)
+- [x] Install dependencies:
+  - [x] `@veramo/core` - DID/VC agent framework
+  - [x] `ethers` - Ethereum utilities
+  - [x] `jose` - JWT signing/verification
+  - [x] `axios` - HTTP client
 
 #### DID Manager
-- [ ] Create `src/core/DIDManager.ts`
-- [ ] Implement `createDID()` - generate Ed25519 key pair
-- [ ] Implement `loadDID()` - retrieve from storage
-- [ ] Implement `getDID()` - return current DID string
-- [ ] Implement `signPayload(payload)` - sign with private key
+- [x] Create `src/core/DIDManager.ts`
+- [x] Implement `createDID()` - generate Ed25519 key pair
+- [x] Implement `loadDID()` - retrieve from storage
+- [x] Implement `getDID()` - return current DID string
+- [x] Implement `signPayload(payload)` - sign with private key
 
 #### Key Storage
-- [ ] Create `src/services/storage.ts`
-- [ ] Implement `saveKeys(keys)` - store in localStorage (encrypted for MVP)
-- [ ] Implement `loadKeys()` - retrieve from localStorage
-- [ ] Implement `exportMnemonic()` - generate recovery phrase
-- [ ] Implement `importFromMnemonic(mnemonic)` - restore keys
+- [x] Create `src/services/storage.ts`
+- [x] Implement `saveKeys(keys)` - store in localStorage (encrypted for MVP)
+- [x] Implement `loadKeys()` - retrieve from localStorage
+- [x] Implement `exportMnemonic()` - generate recovery phrase
+- [x] Implement `importFromMnemonic(mnemonic)` - restore keys
 
 #### UI Components
-- [ ] Create `src/ui/Onboarding.tsx`
-- [ ] "Create Wallet" button
-- [ ] Display generated DID
-- [ ] Recovery phrase backup prompt
+- [x] Create `src/ui/Onboarding.tsx`
+- [x] "Create Wallet" button
+- [x] Display generated DID
+- [x] Recovery phrase backup prompt
 
 #### Testing
 - [ ] Can create 5 independent DIDs

@@ -39,9 +39,9 @@
 - [x] Recovery phrase backup prompt
 
 #### Testing
-- [ ] Can create 5 independent DIDs
-- [ ] Can recover DID from seed phrase
-- [ ] DID persists across page refresh
+- [x] Can create 5 independent DIDs
+- [x] Can recover DID from seed phrase
+- [x] DID persists across page refresh
 
 ---
 

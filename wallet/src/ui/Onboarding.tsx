@@ -12,6 +12,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [importMnemonic, setImportMnemonic] = useState('');
   const [error, setError] = useState('');
   const [showMnemonic, setShowMnemonic] = useState(false);
+  const [confirmedBackup, setConfirmedBackup] = useState(false);
   const [createdDID, setCreatedDID] = useState<string | null>(null);
   const [createdMnemonic, setCreatedMnemonic] = useState<string | null>(null);
 
@@ -21,15 +22,15 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     
     try {
       // Generate new DID and key pair
-      const { did, keyPair } = await DIDManager.createDID();
-      const mnemonicPhrase = DIDManager.generateMnemonic();
+      const { did, keyPair, mnemonic } = await DIDManager.createDID();
       
       // Save to storage
-      StorageService.saveKeys(keyPair, did, mnemonicPhrase);
+      StorageService.saveKeys(keyPair, did, mnemonic);
       
       // Show mnemonic backup prompt
       setCreatedDID(did);
-      setCreatedMnemonic(mnemonicPhrase);
+      setCreatedMnemonic(mnemonic);
+      setConfirmedBackup(false);
       setShowMnemonic(true);
     } catch (err) {
       setError('Failed to create wallet. Please try again.');
@@ -122,13 +123,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
             <input
               type="checkbox"
-              id="confirmed"
-              onChange={(e) => {
-                const button = document.getElementById('confirm-btn') as HTMLButtonElement;
-                if (button) {
-                  button.disabled = !e.target.checked;
-                }
-              }}
+              checked={confirmedBackup}
+              onChange={(e) => setConfirmedBackup(e.target.checked)}
               style={{ marginRight: '8px' }}
             />
             I have safely stored my recovery phrase
@@ -136,16 +132,15 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
         </div>
 
         <button
-          id="confirm-btn"
           onClick={handleConfirmMnemonic}
-          disabled
+          disabled={!confirmedBackup}
           style={{
             background: '#28a745',
             color: 'white',
             border: 'none',
             padding: '12px 24px',
             borderRadius: '6px',
-            cursor: 'not-allowed',
+            cursor: confirmedBackup ? 'pointer' : 'not-allowed',
             fontSize: '16px',
             width: '100%'
           }}

@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import * as jose from 'jose';
 
 export interface KeyPair {
   privateKey: string;
@@ -27,9 +26,13 @@ export class DIDManager {
   /**
    * Generate a new Ed25519 key pair and create a DID
    */
-  static async createDID(): Promise<{ did: string; keyPair: KeyPair }> {
+  static async createDID(): Promise<{ did: string; keyPair: KeyPair; mnemonic: string }> {
     // Generate Ed25519 key pair using ethers
     const wallet = ethers.Wallet.createRandom();
+    const mnemonic = (wallet as any).mnemonic?.phrase;
+    if (!mnemonic) {
+      throw new Error('Failed to generate mnemonic');
+    }
     
     // Get the public key from the private key using the correct ethers method
     const publicKeyBytes = ethers.SigningKey.computePublicKey(wallet.privateKey, false);
@@ -49,7 +52,7 @@ export class DIDManager {
     const multibaseKey = this.bytesToBase58btc(combinedKey);
     const did = `${this.DID_METHOD}:${multibaseKey}`;
 
-    return { did, keyPair };
+    return { did, keyPair, mnemonic };
   }
 
   /**
@@ -130,10 +133,12 @@ export class DIDManager {
    */
   static async fromMnemonic(mnemonic: string): Promise<{ did: string; keyPair: KeyPair }> {
     const wallet = ethers.Wallet.fromPhrase(mnemonic);
+
+    const publicKeyBytes = ethers.SigningKey.computePublicKey(wallet.privateKey, false);
     
     const keyPair: KeyPair = {
       privateKey: wallet.privateKey,
-      publicKey: wallet.publicKey,
+      publicKey: publicKeyBytes,
       address: wallet.address
     };
 

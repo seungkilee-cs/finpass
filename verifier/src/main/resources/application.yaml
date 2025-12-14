@@ -1,0 +1,21 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: verifier
+
+verifier:
+  did: ${VERIFIER_DID:did:example:verifier}
+  privateJwk: ${VERIFIER_PRIVATE_JWK:}
+
+trusted:
+  issuerDid: ${TRUSTED_ISSUER_DID:did:example:issuer}
+  issuerPublicJwk: ${TRUSTED_ISSUER_PUBLIC_JWK:}
+
+challenge:
+  ttlSeconds: ${CHALLENGE_TTL_SECONDS:300}
+
+decision:
+  ttlSeconds: ${DECISION_TTL_SECONDS:300}
+

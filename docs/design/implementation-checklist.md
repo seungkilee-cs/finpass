@@ -142,36 +142,36 @@
 ### M0.4 — Verifier Scaffold (Days 4–5)
 
 #### Verifier Endpoints
-- [ ] Create `VerifierController.java`
-- [ ] `GET /verify/challenge` - return nonce/challenge for anti-replay
-- [ ] `POST /verify` - accept ZKP proof + public signals + issuer commitment, return decision token
-- [ ] `GET /.well-known/openid-provider` - return hardcoded metadata
+- [x] Create `VerifierController.java`
+- [x] `GET /verify/challenge` - return nonce/challenge for anti-replay
+- [x] `POST /verify` - accept ZKP proof + public signals + issuer commitment, return decision token
+- [x] `GET /.well-known/openid-provider` - return hardcoded metadata
 
 #### ZKP Validation (PoC Minimal)
-- [ ] Create `VerifierService.java`
-- [ ] Implement `validateProof(request)`:
-  - [ ] Validate request has `challenge`/nonce
-  - [ ] Verify issuer signature over commitment
-  - [ ] Verify ZKP proof (e.g., Groth16 verification)
-  - [ ] Ensure proof binds to challenge (anti-replay)
-  - [ ] Check issuer is in trusted list (hardcoded)
-  - [ ] Ensure verification does not require raw DOB/passport number fields
+- [x] Create `VerifierService.java`
+- [x] Implement `validateProof(request)`:
+  - [x] Validate request has `challenge`/nonce
+  - [x] Verify issuer signature over commitment
+  - [x] Verify ZKP proof (e.g., Groth16 verification)
+  - [x] Ensure proof binds to challenge (anti-replay)
+  - [x] Check issuer is in trusted list (hardcoded)
+  - [x] Ensure verification does not require raw DOB/passport number fields
 
 #### Decision Token
-- [ ] Define decision token claims:
-  - [ ] `sub` - holder DID
-  - [ ] `verified_at` - timestamp
-  - [ ] `assurance_level` - "LOW" for PoC
-  - [ ] `verified_claims` - list of verified attributes
-  - [ ] `expires_in` - 300 seconds
-  - [ ] `jti` - unique token ID
-- [ ] Sign with verifier private key
-- [ ] Return as JSON response
+- [x] Define decision token claims:
+  - [x] `sub` - holder DID
+  - [x] `verified_at` - timestamp
+  - [x] `assurance_level` - "LOW" for PoC
+  - [x] `verified_claims` - list of verified attributes
+  - [x] `expires_in` - 300 seconds
+  - [x] `jti` - unique token ID
+- [x] Sign with verifier private key
+- [x] Return as JSON response
 
 #### Trusted Issuer List
-- [ ] Create `TrustedIssuers.java` config
-- [ ] Hardcode issuer DID(s) for PoC
-- [ ] Implement `isTrusted(issuerDID)` check
+- [x] Create `TrustedIssuers.java` config
+- [x] Hardcode issuer DID(s) for PoC
+- [x] Implement `isTrusted(issuerDID)` check
 
 #### Testing
 - [ ] Postman: POST valid ZKP proof → receive decision token
@@ -183,35 +183,35 @@
 ### M0.5 — Wallet ↔ Verifier Integration (Days 5–6)
 
 #### ZKP Proof Generator
-- [ ] Create `src/core/ZKProofGenerator.ts`
-- [ ] Define witness input mapping from credential attributes
-- [ ] Implement `generateOver18Proof(credential, challenge)`
-- [ ] Ensure proof generation happens locally
-- [ ] Ensure generated payload omits unnecessary PII (no full DOB/MRZ/passport number)
+- [x] Create `src/core/ZKProofGenerator.ts`
+- [x] Define witness input mapping from credential attributes
+- [x] Implement `generateOver18Proof(credential, challenge)`
+- [x] Ensure proof generation happens locally
+- [x] Ensure generated payload omits unnecessary PII (no full DOB/MRZ/passport number)
 
 #### Verification Flow
-- [ ] Create `src/flows/VerificationFlow.ts`
-- [ ] Implement `verify(vcId, verifierUrl)`:
-  - [ ] Load VC from storage
-  - [ ] Fetch `challenge` from verifier (`GET /verify/challenge`)
-  - [ ] Create ZKP proof for required predicate (PoC: `over_18`)
-  - [ ] POST proof + public signals + issuer commitment to verifier
-  - [ ] Store decision token
-  - [ ] Return verification result
+- [x] Create `src/flows/VerificationFlow.ts`
+- [x] Implement `verify(vcId, verifierUrl)`:
+  - [x] Load VC from storage
+  - [x] Fetch `challenge` from verifier (`GET /verify/challenge`)
+  - [x] Create ZKP proof for required predicate (PoC: `over_18`)
+  - [x] POST proof + public signals + issuer commitment to verifier
+  - [x] Store decision token
+  - [x] Return verification result
 
 #### Decision Token Storage
-- [ ] Implement `storeDecisionToken(token)` in storage service
-- [ ] Implement `getValidDecisionToken()` - check expiry
-- [ ] Implement `clearExpiredTokens()`
+- [x] Implement `storeDecisionToken(token)` in storage service
+- [x] Implement `getValidDecisionToken()` - check expiry
+- [x] Implement `clearExpiredTokens()`
 
 #### UI Components
-- [ ] Create `src/ui/VerificationFlow.tsx`
-- [ ] "Prove Over 18" button
-- [ ] Show verifier request details
-- [ ] Confirmation dialog
-- [ ] Loading state during verification
-- [ ] Success: "✓ Verified" display
-- [ ] Error: Clear error message
+- [x] Create `src/ui/VerificationFlow.tsx`
+- [x] "Prove Over 18" button
+- [x] Show verifier request details
+- [x] Confirmation dialog
+- [x] Loading state during verification
+- [x] Success: "✓ Verified" display
+- [x] Error: Clear error message
 
 #### Testing
 - [ ] Full flow: select credential → present → see verified status

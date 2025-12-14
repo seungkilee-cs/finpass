@@ -15,11 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finpass.issuer.dto.IssueRequest;
 import com.finpass.issuer.dto.IssueWithProofRequest;
 import com.finpass.issuer.dto.IssueResponse;
 import com.finpass.issuer.dto.StatusResponse;
 import com.finpass.issuer.repository.CredentialRepository;
+import com.finpass.issuer.service.IssuerKeyProvider;
 import com.finpass.issuer.service.IssuerService;
 
 import jakarta.validation.Valid;
@@ -29,17 +32,22 @@ import jakarta.validation.Valid;
 @Validated
 public class IssuerController {
 
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
 	private final IssuerService issuerService;
 	private final CredentialRepository credentialRepository;
+	private final IssuerKeyProvider keyProvider;
 	private final String issuerDid;
 
 	public IssuerController(
 			IssuerService issuerService,
 			CredentialRepository credentialRepository,
+			IssuerKeyProvider keyProvider,
 			@Value("${issuer.did}") String issuerDid
 	) {
 		this.issuerService = issuerService;
 		this.credentialRepository = credentialRepository;
+		this.keyProvider = keyProvider;
 		this.issuerDid = issuerDid;
 	}
 
@@ -49,6 +57,7 @@ public class IssuerController {
 		resp.put("issuer_did", issuerDid);
 		resp.put("credential_endpoint", "http://localhost:8080/issue");
 		resp.put("credential_endpoint_with_proof", "http://localhost:8080/issue-with-proof");
+		resp.put("jwks_uri", "http://localhost:8080/jwks.json");
 		resp.put("credential_configurations_supported", Map.of(
 				"PassportCredential", Map.of(
 						"format", "jwt_vc",
@@ -58,6 +67,17 @@ public class IssuerController {
 				)
 		));
 		return resp;
+	}
+
+	@GetMapping("/jwks.json")
+	public Map<String, Object> jwks() {
+		try {
+			Map<String, Object> jwk = OBJECT_MAPPER.readValue(keyProvider.exportPublicJwkJson(), new TypeReference<Map<String, Object>>() {
+			});
+			return Map.of("keys", java.util.List.of(jwk));
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to build JWKS", e);
+		}
 	}
 
 	@PostMapping("/issue")

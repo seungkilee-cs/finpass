@@ -20,10 +20,21 @@ export interface StoredCredential {
   receivedAt: string;
 }
 
+export interface StoredDecisionToken {
+  credId: string;
+  verifierUrl: string;
+  decisionToken: string;
+  assuranceLevel: string;
+  verifiedClaims: string[];
+  expiresAt: string;
+  receivedAt: string;
+}
+
 export class StorageService {
   private static readonly KEYS_STORAGE_KEY = 'finpass_wallet_keys';
   private static readonly MNEMONIC_STORAGE_KEY = 'finpass_wallet_mnemonic';
   private static readonly CREDENTIALS_STORAGE_KEY = 'finpass_wallet_credentials';
+  private static readonly DECISION_TOKENS_STORAGE_KEY = 'finpass_wallet_decision_tokens';
 
   /**
    * Save keys to localStorage (encrypted for MVP)
@@ -74,6 +85,7 @@ export class StorageService {
     localStorage.removeItem(this.KEYS_STORAGE_KEY);
     localStorage.removeItem(this.MNEMONIC_STORAGE_KEY);
     localStorage.removeItem(this.CREDENTIALS_STORAGE_KEY);
+    localStorage.removeItem(this.DECISION_TOKENS_STORAGE_KEY);
   }
 
   static storeCredential(credential: StoredCredential): void {
@@ -106,6 +118,69 @@ export class StorageService {
   static getCredentialById(credId: string): StoredCredential | null {
     const creds = this.getCredentials();
     return creds.find(c => c.credId === credId) || null;
+  }
+
+  static storeDecisionToken(token: StoredDecisionToken): void {
+    try {
+      const existing = this.getDecisionTokens();
+      const withoutDup = existing.filter(t => !(t.credId === token.credId && t.verifierUrl === token.verifierUrl));
+      const updated = [token, ...withoutDup];
+      const encrypted = this.simpleEncrypt(JSON.stringify(updated));
+      localStorage.setItem(this.DECISION_TOKENS_STORAGE_KEY, encrypted);
+    } catch (error) {
+      console.error('Failed to store decision token:', error);
+      throw new Error('Failed to store decision token');
+    }
+  }
+
+  static getDecisionTokens(): StoredDecisionToken[] {
+    try {
+      const encrypted = localStorage.getItem(this.DECISION_TOKENS_STORAGE_KEY);
+      if (!encrypted) return [];
+      const decrypted = this.simpleDecrypt(encrypted);
+      const parsed = JSON.parse(decrypted);
+      if (!Array.isArray(parsed)) return [];
+      return parsed as StoredDecisionToken[];
+    } catch (error) {
+      console.error('Failed to load decision tokens:', error);
+      return [];
+    }
+  }
+
+  static clearExpiredTokens(): void {
+    try {
+      const now = Date.now();
+      const tokens = this.getDecisionTokens();
+      const kept = tokens.filter(t => {
+        const exp = Date.parse(t.expiresAt);
+        return Number.isFinite(exp) && exp > now;
+      });
+      const encrypted = this.simpleEncrypt(JSON.stringify(kept));
+      localStorage.setItem(this.DECISION_TOKENS_STORAGE_KEY, encrypted);
+    } catch (error) {
+      console.error('Failed to clear expired decision tokens:', error);
+    }
+  }
+
+  static getValidDecisionToken(params?: { credId?: string; verifierUrl?: string; requiredClaims?: string[] }): StoredDecisionToken | null {
+    this.clearExpiredTokens();
+    const now = Date.now();
+    const tokens = this.getDecisionTokens();
+
+    const filtered = tokens.filter(t => {
+      const exp = Date.parse(t.expiresAt);
+      if (!Number.isFinite(exp) || exp <= now) return false;
+      if (params?.credId && t.credId !== params.credId) return false;
+      if (params?.verifierUrl && t.verifierUrl !== params.verifierUrl) return false;
+      if (params?.requiredClaims && params.requiredClaims.length > 0) {
+        for (const c of params.requiredClaims) {
+          if (!t.verifiedClaims.includes(c)) return false;
+        }
+      }
+      return true;
+    });
+
+    return filtered.length > 0 ? filtered[0] : null;
   }
 
   /**

@@ -15,6 +15,7 @@ const WalletDashboard: React.FC<{ walletInfo: WalletInfo }> = ({ walletInfo }) =
   const [credentials, setCredentials] = useState(StorageService.getCredentials());
 
   const issuerUrl = 'http://localhost:8080';
+  const verifierUrl = 'http://localhost:8090';
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -101,7 +102,7 @@ const WalletDashboard: React.FC<{ walletInfo: WalletInfo }> = ({ walletInfo }) =
         <p style={{ marginBottom: '15px' }}>Your wallet is ready! Here's what you can do next:</p>
         <ul style={{ paddingLeft: '20px', margin: 0 }}>
           <li>Get your passport credential</li>
-          <li>Prove your identity without revealing PII (coming soon)</li>
+          <li>Prove you're over 18 to a verifier without sharing PII</li>
           <li>Make payments with KYC verification (coming soon)</li>
         </ul>
       </div>
@@ -142,7 +143,7 @@ const WalletDashboard: React.FC<{ walletInfo: WalletInfo }> = ({ walletInfo }) =
         ) : (
           <div>
             {credentials.map(c => (
-              <CredentialCard key={c.credId} credential={c} />
+              <CredentialCard key={c.credId} credential={c} verifierUrl={verifierUrl} />
             ))}
           </div>
         )}

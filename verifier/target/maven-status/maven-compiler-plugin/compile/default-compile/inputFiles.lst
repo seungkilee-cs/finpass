@@ -1,0 +1,12 @@
+/Users/seungkilee/Workspace/seungkilee-cs/finpass/verifier/src/main/java/com/finpass/verifier/VerifierApplication.java
+/Users/seungkilee/Workspace/seungkilee-cs/finpass/verifier/src/main/java/com/finpass/verifier/config/CorsConfig.java
+/Users/seungkilee/Workspace/seungkilee-cs/finpass/verifier/src/main/java/com/finpass/verifier/config/TrustedIssuers.java
+/Users/seungkilee/Workspace/seungkilee-cs/finpass/verifier/src/main/java/com/finpass/verifier/controller/GlobalExceptionHandler.java
+/Users/seungkilee/Workspace/seungkilee-cs/finpass/verifier/src/main/java/com/finpass/verifier/controller/VerifierController.java
+/Users/seungkilee/Workspace/seungkilee-cs/finpass/verifier/src/main/java/com/finpass/verifier/dto/ChallengeResponse.java
+/Users/seungkilee/Workspace/seungkilee-cs/finpass/verifier/src/main/java/com/finpass/verifier/dto/ErrorResponse.java
+/Users/seungkilee/Workspace/seungkilee-cs/finpass/verifier/src/main/java/com/finpass/verifier/dto/VerifyRequest.java
+/Users/seungkilee/Workspace/seungkilee-cs/finpass/verifier/src/main/java/com/finpass/verifier/dto/VerifyResponse.java
+/Users/seungkilee/Workspace/seungkilee-cs/finpass/verifier/src/main/java/com/finpass/verifier/service/ChallengeStore.java
+/Users/seungkilee/Workspace/seungkilee-cs/finpass/verifier/src/main/java/com/finpass/verifier/service/VerifierKeyProvider.java
+/Users/seungkilee/Workspace/seungkilee-cs/finpass/verifier/src/main/java/com/finpass/verifier/service/VerifierService.java

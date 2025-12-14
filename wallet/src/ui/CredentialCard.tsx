@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { StoredCredential } from '../services/storage';
+import { VerificationFlow } from './VerificationFlow';
 
 function decodeBase64Url(input: string): string {
   const padded = input.replace(/-/g, '+').replace(/_/g, '/');
@@ -18,7 +19,7 @@ function decodeJwtPayload(jwt: string): any {
   }
 }
 
-export const CredentialCard: React.FC<{ credential: StoredCredential }> = ({ credential }) => {
+export const CredentialCard: React.FC<{ credential: StoredCredential; verifierUrl: string }> = ({ credential, verifierUrl }) => {
   const [expanded, setExpanded] = useState(false);
 
   const subject = useMemo(() => {
@@ -93,6 +94,8 @@ export const CredentialCard: React.FC<{ credential: StoredCredential }> = ({ cre
               Copy commitmentJwt
             </button>
           </div>
+
+          <VerificationFlow credential={credential} verifierUrl={verifierUrl} />
         </div>
       )}
     </div>

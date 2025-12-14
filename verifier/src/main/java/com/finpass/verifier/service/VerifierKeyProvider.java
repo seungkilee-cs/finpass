@@ -1,4 +1,4 @@
-package com.finpass.issuer.service;
+package com.finpass.verifier.service;
 
 import java.text.ParseException;
 import java.util.UUID;
@@ -8,25 +8,25 @@ import org.springframework.stereotype.Component;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.crypto.Ed25519Signer;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
-import com.nimbusds.jose.crypto.Ed25519Signer;
-import com.nimbusds.jose.JWSSigner;
 
 @Component
-public class IssuerKeyProvider {
+public class VerifierKeyProvider {
 
 	private final OctetKeyPair signingKey;
 	private final JWSSigner signer;
 
-	public IssuerKeyProvider(@Value("${issuer.privateJwk:}") String privateJwk) {
+	public VerifierKeyProvider(@Value("${verifier.privateJwk:}") String privateJwk) {
 		this.signingKey = loadOrGenerate(privateJwk);
 		try {
 			this.signer = new Ed25519Signer(signingKey);
 		} catch (JOSEException e) {
-			throw new RuntimeException("Failed to initialize issuer signer", e);
+			throw new RuntimeException("Failed to initialize verifier signer", e);
 		}
 	}
 
@@ -55,7 +55,7 @@ public class IssuerKeyProvider {
 			try {
 				return OctetKeyPair.parse(privateJwk);
 			} catch (ParseException e) {
-				throw new IllegalArgumentException("Invalid issuer.privateJwk", e);
+				throw new IllegalArgumentException("Invalid verifier.privateJwk", e);
 			}
 		}
 
@@ -65,7 +65,7 @@ public class IssuerKeyProvider {
 					.keyID(UUID.randomUUID().toString())
 					.generate();
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to generate issuer signing key", e);
+			throw new RuntimeException("Failed to generate verifier signing key", e);
 		}
 	}
 }

@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16.10-alpine
+    container_name: finpass-postgres
+    environment:
+      POSTGRES_DB: finpass
+      POSTGRES_USER: finpass
+      POSTGRES_PASSWORD: finpass
+    ports:
+      - "15432:5432"
+    volumes:
+      - finpass_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finpass -d finpass"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  finpass_pgdata:

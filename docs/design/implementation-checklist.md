@@ -48,56 +48,56 @@
 ### M0.2 — Issuer Scaffold (Days 2–3)
 
 #### Backend Setup
-- [ ] Initialize Spring Boot project (Java 17, Maven/Gradle)
-- [ ] Configure `application.yaml`:
-  - [ ] Database connection
-  - [ ] CORS settings
-  - [ ] Server port
-- [ ] Add dependencies:
-  - [ ] Spring Web
-  - [ ] Spring Data JPA
-  - [ ] PostgreSQL driver
-  - [ ] Nimbus JOSE JWT
+- [x] Initialize Spring Boot project (Java 17, Maven/Gradle)
+- [x] Configure `application.yaml`:
+  - [x] Database connection
+  - [x] CORS settings
+  - [x] Server port
+- [x] Add dependencies:
+  - [x] Spring Web
+  - [x] Spring Data JPA
+  - [x] PostgreSQL driver
+  - [x] Nimbus JOSE JWT
 
 #### Database Schema
-- [ ] Create `V1__init.sql` migration
-- [ ] `users` table (id, did, created_at)
-- [ ] `credentials` table (id, user_id, credential_jwt, issued_at, status)
-- [ ] `issuances` table (id, credential_id, issuer_did, timestamp)
+- [x] Create `V1__init.sql` migration
+- [x] `users` table (id, did, created_at)
+- [x] `credentials` table (id, user_id, credential_jwt, issued_at, status)
+- [x] `issuances` table (id, credential_id, issuer_did, timestamp)
 
 #### Security Config
-- [ ] Create `SecurityConfig.java`
-- [ ] Configure CORS for localhost:3000
-- [ ] Disable CSRF for REST API
-- [ ] Basic request validation
+- [x] Create `SecurityConfig.java`
+- [x] Configure CORS for localhost:3000
+- [x] Disable CSRF for REST API
+- [x] Basic request validation
 
 #### Issuer Endpoints
-- [ ] Create `IssuerController.java`
-- [ ] `GET /.well-known/openid-credential-issuer` - return hardcoded metadata
-- [ ] `POST /issue` - accept passport data + DID, return VC
-- [ ] `GET /status/{credId}` - return credential status (always "valid" for PoC)
+- [x] Create `IssuerController.java`
+- [x] `GET /.well-known/openid-credential-issuer` - return hardcoded metadata
+- [x] `POST /issue` - accept passport data + DID, return VC
+- [x] `GET /status/{credId}` - return credential status (always "valid" for PoC)
 
 #### Issuer Key Management
-- [ ] Generate Ed25519 issuer key pair
-- [ ] Store issuer private key (env variable or keystore)
-- [ ] Create `IssuerService.java`
-- [ ] Implement `generateVC(passportData, holderDID)` - create and sign JWT-VC
+- [x] Generate Ed25519 issuer key pair
+- [x] Store issuer private key (env variable or keystore)
+- [x] Create `IssuerService.java`
+- [x] Implement `generateVC(passportData, holderDID)` - create and sign JWT-VC
 
 #### VC Generation
-- [ ] Define PassportCredential schema
-- [ ] Build JWT with claims (name, nationality, birthDate, etc.)
-- [ ] Sign with issuer private key
-- [ ] Return as JSON response
+- [x] Define PassportCredential schema
+- [x] Build JWT with claims (name, nationality, birthDate, etc.)
+- [x] Sign with issuer private key
+- [x] Return as JSON response
 
 #### ZKP Commitment (PoC Minimal)
-- [ ] Define canonicalization for passport attributes used in proofs (synthetic data)
-- [ ] Compute issuer-signed commitment over attributes (e.g., hash/commitment)
-- [ ] Include commitment in issuance response (or a separate signed object)
+- [x] Define canonicalization for passport attributes used in proofs (synthetic data)
+- [x] Compute issuer-signed commitment over attributes (e.g., hash/commitment)
+- [x] Include commitment in issuance response (or a separate signed object)
 
 #### Testing
-- [ ] Postman: POST `/issue` with sample data
-- [ ] Verify JWT decodes correctly
-- [ ] Verify issuer signature is valid
+- [x] Postman: POST `/issue` with sample data
+- [x] Verify JWT decodes correctly
+- [x] Verify issuer signature is valid
 
 ---
 

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.finpass.issuer.dto.IssueRequest;
+import com.finpass.issuer.dto.IssueWithProofRequest;
 import com.finpass.issuer.dto.IssueResponse;
 import com.finpass.issuer.dto.StatusResponse;
 import com.finpass.issuer.repository.CredentialRepository;
@@ -47,6 +48,7 @@ public class IssuerController {
 		Map<String, Object> resp = new LinkedHashMap<>();
 		resp.put("issuer_did", issuerDid);
 		resp.put("credential_endpoint", "http://localhost:8080/issue");
+		resp.put("credential_endpoint_with_proof", "http://localhost:8080/issue-with-proof");
 		resp.put("credential_configurations_supported", Map.of(
 				"PassportCredential", Map.of(
 						"format", "jwt_vc",
@@ -61,6 +63,12 @@ public class IssuerController {
 	@PostMapping("/issue")
 	public ResponseEntity<IssueResponse> issue(@Valid @RequestBody IssueRequest request) {
 		IssueResponse resp = issuerService.issuePassportCredential(request.getHolderDid(), request.getPassportData());
+		return ResponseEntity.ok(resp);
+	}
+
+	@PostMapping("/issue-with-proof")
+	public ResponseEntity<IssueResponse> issueWithProof(@Valid @RequestBody IssueWithProofRequest request) {
+		IssueResponse resp = issuerService.issuePassportCredentialWithProof(request);
 		return ResponseEntity.ok(resp);
 	}
 

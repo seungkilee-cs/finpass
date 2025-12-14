@@ -104,38 +104,38 @@
 ### M0.3 — Wallet ↔ Issuer Integration (Days 3–4)
 
 #### Wallet Issuance Flow
-- [ ] Create `src/core/CredentialHolder.ts`
-- [ ] Implement `requestCredential(issuerUrl, passportData)`
-- [ ] Fetch issuer metadata
-- [ ] Create proof (sign with wallet key)
-- [ ] POST credential request
-- [ ] Store returned VC
+- [x] Create `src/core/CredentialHolder.ts`
+- [x] Implement `requestCredential(issuerUrl, passportData)`
+- [x] Fetch issuer metadata
+- [x] Create proof (sign with wallet key)
+- [x] POST credential request
+- [x] Store returned VC
 
 #### Issuer Validation
-- [ ] Validate wallet proof signature in `IssuerService`
-- [ ] Verify DID in proof matches request DID
-- [ ] Bind VC to wallet DID (subject claim)
+- [x] Validate wallet proof signature in `IssuerService`
+- [x] Verify DID in proof matches request DID
+- [x] Bind VC to wallet DID (subject claim)
 
 #### VC Storage
-- [ ] Implement `storeCredential(vc)` in CredentialHolder
-- [ ] Encrypt VC before storing (optional for PoC)
-- [ ] Implement `getCredentials()` - list stored VCs
-- [ ] Implement `getCredentialById(id)`
+- [x] Implement `storeCredential(vc)` in CredentialHolder
+- [x] Encrypt VC before storing (optional for PoC)
+- [x] Implement `getCredentials()` - list stored VCs
+- [x] Implement `getCredentialById(id)`
 
 #### UI Components
-- [ ] Create `src/ui/CredentialCard.tsx`
-- [ ] Display credential summary (name, nationality, expiry)
-- [ ] Visual indicator for credential status
-- [ ] Create issuance flow UI:
-  - [ ] "Get Credential" button
-  - [ ] Passport data input (or mock scanner)
-  - [ ] Loading state during issuance
-  - [ ] Success confirmation
+- [x] Create `src/ui/CredentialCard.tsx`
+- [x] Display credential summary (name, nationality, expiry)
+- [x] Visual indicator for credential status
+- [x] Create issuance flow UI:
+  - [x] "Get Credential" button
+  - [x] Passport data input (or mock scanner)
+  - [x] Loading state during issuance
+  - [x] Success confirmation
 
 #### Testing
-- [ ] Full flow: create DID → request credential → see in wallet
-- [ ] Credential displays correct data
-- [ ] Credential persists across sessions
+- [x] Full flow: create DID → request credential → see in wallet
+- [x] Credential displays correct data
+- [x] Credential persists across sessions
 
 ---
 

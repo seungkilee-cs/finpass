@@ -9,9 +9,21 @@ export interface StoredKeys {
   createdAt: string;
 }
 
+export interface StoredCredential {
+  credId: string;
+  issuerDid: string;
+  status: string;
+  credentialJwt: string;
+  commitmentHash: string;
+  commitmentJwt: string;
+  holderDid: string;
+  receivedAt: string;
+}
+
 export class StorageService {
   private static readonly KEYS_STORAGE_KEY = 'finpass_wallet_keys';
   private static readonly MNEMONIC_STORAGE_KEY = 'finpass_wallet_mnemonic';
+  private static readonly CREDENTIALS_STORAGE_KEY = 'finpass_wallet_credentials';
 
   /**
    * Save keys to localStorage (encrypted for MVP)
@@ -61,6 +73,39 @@ export class StorageService {
   static clearKeys(): void {
     localStorage.removeItem(this.KEYS_STORAGE_KEY);
     localStorage.removeItem(this.MNEMONIC_STORAGE_KEY);
+    localStorage.removeItem(this.CREDENTIALS_STORAGE_KEY);
+  }
+
+  static storeCredential(credential: StoredCredential): void {
+    try {
+      const existing = this.getCredentials();
+      const withoutDup = existing.filter(c => c.credId !== credential.credId);
+      const updated = [credential, ...withoutDup];
+      const encrypted = this.simpleEncrypt(JSON.stringify(updated));
+      localStorage.setItem(this.CREDENTIALS_STORAGE_KEY, encrypted);
+    } catch (error) {
+      console.error('Failed to store credential:', error);
+      throw new Error('Failed to store credential');
+    }
+  }
+
+  static getCredentials(): StoredCredential[] {
+    try {
+      const encrypted = localStorage.getItem(this.CREDENTIALS_STORAGE_KEY);
+      if (!encrypted) return [];
+      const decrypted = this.simpleDecrypt(encrypted);
+      const parsed = JSON.parse(decrypted);
+      if (!Array.isArray(parsed)) return [];
+      return parsed as StoredCredential[];
+    } catch (error) {
+      console.error('Failed to load credentials:', error);
+      return [];
+    }
+  }
+
+  static getCredentialById(credId: string): StoredCredential | null {
+    const creds = this.getCredentials();
+    return creds.find(c => c.credId === credId) || null;
   }
 
   /**

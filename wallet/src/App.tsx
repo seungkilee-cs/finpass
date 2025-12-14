@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Onboarding } from './ui/Onboarding';
 import { StorageService } from './services/storage';
+import { IssuanceFlow } from './ui/IssuanceFlow';
+import { CredentialCard } from './ui/CredentialCard';
 import './App.css';
 
 interface WalletInfo {
@@ -10,6 +12,9 @@ interface WalletInfo {
 
 const WalletDashboard: React.FC<{ walletInfo: WalletInfo }> = ({ walletInfo }) => {
   const [copied, setCopied] = useState(false);
+  const [credentials, setCredentials] = useState(StorageService.getCredentials());
+
+  const issuerUrl = 'http://localhost:8080';
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -95,10 +100,52 @@ const WalletDashboard: React.FC<{ walletInfo: WalletInfo }> = ({ walletInfo }) =
         <h3 style={{ marginTop: 0, color: '#0066cc' }}>📋 Next Steps</h3>
         <p style={{ marginBottom: '15px' }}>Your wallet is ready! Here's what you can do next:</p>
         <ul style={{ paddingLeft: '20px', margin: 0 }}>
-          <li>Get your passport credential (coming soon)</li>
+          <li>Get your passport credential</li>
           <li>Prove your identity without revealing PII (coming soon)</li>
           <li>Make payments with KYC verification (coming soon)</li>
         </ul>
+      </div>
+
+      <IssuanceFlow
+        issuerUrl={issuerUrl}
+        onIssued={() => {
+          setCredentials(StorageService.getCredentials());
+        }}
+      />
+
+      <div style={{
+        background: 'white',
+        border: '1px solid #e9ecef',
+        borderRadius: '8px',
+        padding: '20px',
+        marginBottom: '20px'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 style={{ marginTop: 0, color: '#333' }}>Your Credentials</h2>
+          <button
+            onClick={() => setCredentials(StorageService.getCredentials())}
+            style={{
+              background: '#6c757d',
+              color: 'white',
+              border: 'none',
+              padding: '8px 12px',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            Refresh
+          </button>
+        </div>
+
+        {credentials.length === 0 ? (
+          <div style={{ color: '#666' }}>No credentials stored yet.</div>
+        ) : (
+          <div>
+            {credentials.map(c => (
+              <CredentialCard key={c.credId} credential={c} />
+            ))}
+          </div>
+        )}
       </div>
 
       <div style={{

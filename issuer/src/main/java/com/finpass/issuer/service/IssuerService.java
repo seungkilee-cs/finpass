@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finpass.issuer.dto.IssueWithProofRequest;
 import com.finpass.issuer.dto.IssueResponse;
 import com.finpass.issuer.entity.CredentialEntity;
 import com.finpass.issuer.entity.IssuanceEntity;
@@ -17,6 +20,7 @@ import com.finpass.issuer.repository.IssuanceRepository;
 import com.finpass.issuer.repository.UserRepository;
 import com.finpass.issuer.util.CanonicalJson;
 import com.finpass.issuer.util.Hashing;
+import com.finpass.issuer.util.WalletProofVerifier;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -24,6 +28,8 @@ import com.nimbusds.jwt.SignedJWT;
 
 @Service
 public class IssuerService {
+
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	private final UserRepository userRepository;
 	private final CredentialRepository credentialRepository;
@@ -86,6 +92,53 @@ public class IssuerService {
 		resp.setCommitmentHash(commitmentHash);
 		resp.setCommitmentJwt(commitmentJwt);
 		return resp;
+	}
+
+	@Transactional
+	public IssueResponse issuePassportCredentialWithProof(IssueWithProofRequest request) {
+		validateWalletProof(request);
+		return issuePassportCredential(request.getHolderDid(), request.getPassportData());
+	}
+
+	private static void validateWalletProof(IssueWithProofRequest request) {
+		Map<String, Object> payload;
+		try {
+			payload = OBJECT_MAPPER.readValue(request.getProofPayload(), new TypeReference<Map<String, Object>>() {
+			});
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Invalid proofPayload JSON", e);
+		}
+
+		Object payloadHolderDid = payload.get("holderDid");
+		if (payloadHolderDid == null || !request.getHolderDid().equals(payloadHolderDid.toString())) {
+			throw new IllegalArgumentException("holderDid mismatch between request and proofPayload");
+		}
+
+		Object payloadHolderAddress = payload.get("holderAddress");
+		if (payloadHolderAddress == null || !request.getHolderAddress().equalsIgnoreCase(payloadHolderAddress.toString())) {
+			throw new IllegalArgumentException("holderAddress mismatch between request and proofPayload");
+		}
+
+		Object payloadPassportData = payload.get("passportData");
+		String reqPassport = CanonicalJson.stringify(request.getPassportData());
+		String payloadPassport = CanonicalJson.stringify(payloadPassportData);
+		if (!reqPassport.equals(payloadPassport)) {
+			throw new IllegalArgumentException("passportData mismatch between request and proofPayload");
+		}
+
+		String canonicalPayload = CanonicalJson.stringify(payload);
+		if (!canonicalPayload.equals(request.getProofPayload())) {
+			throw new IllegalArgumentException("proofPayload must be canonical JSON");
+		}
+
+		boolean ok = WalletProofVerifier.verifyPrefixedMessageSignature(
+				request.getProofPayload(),
+				request.getProofSignature(),
+				request.getHolderAddress()
+		);
+		if (!ok) {
+			throw new IllegalArgumentException("Invalid wallet proof signature");
+		}
 	}
 
 	private String signVcJwt(String holderDid, Map<String, Object> passportData, Instant now) {

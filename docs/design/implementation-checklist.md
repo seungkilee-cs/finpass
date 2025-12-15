@@ -257,9 +257,9 @@
 - [x] KYC verification step (auto-trigger if needed)
 - [x] Confirmation screen
 - [x] Receipt display
-- [ ] Create `src/ui/BalanceDisplay.tsx`
-- [ ] Show current balance
-- [ ] Transaction history (optional)
+- [x] Create `src/ui/BalanceDisplay.tsx`
+- [x] Show current balance
+- [x] Transaction history (optional)
 
 #### Testing
 - [ ] Create 2 test wallets with balance

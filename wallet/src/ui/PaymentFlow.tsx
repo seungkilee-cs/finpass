@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { PaymentClient, PaymentIntentResponse } from '../services/PaymentClient';
 import { StorageService, StoredCredential } from '../services/storage';
 import { VerificationFlow as VerificationFlowApi } from '../flows/VerificationFlow';
+import { BalanceDisplay } from './BalanceDisplay';
+import { PaymentReceipt, TransactionHistory } from './TransactionHistory';
 
 export const PaymentFlow: React.FC<{ verifierUrl: string }> = ({ verifierUrl }) => {
   const paymentBaseUrl = useMemo(() => verifierUrl.replace(/\/$/, ''), [verifierUrl]);
@@ -17,12 +19,18 @@ export const PaymentFlow: React.FC<{ verifierUrl: string }> = ({ verifierUrl }) 
   const [amount, setAmount] = useState<number>(10);
 
   const [intent, setIntent] = useState<PaymentIntentResponse | null>(null);
-  const [payerBalance, setPayerBalance] = useState<number | null>(null);
-  const [receiverBalance, setReceiverBalance] = useState<number | null>(null);
+  const [balanceRefreshNonce, setBalanceRefreshNonce] = useState(0);
+
+  const [receipts, setReceipts] = useState<PaymentReceipt[]>([]);
 
   const [isWorking, setIsWorking] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+
+  const receiptsStorageKey = useMemo(() => {
+    const did = payerDid || 'unknown';
+    return `finpass_wallet_payment_receipts:${did}:${paymentBaseUrl}`;
+  }, [payerDid, paymentBaseUrl]);
 
   useEffect(() => {
     const creds = StorageService.getCredentials();
@@ -30,17 +38,38 @@ export const PaymentFlow: React.FC<{ verifierUrl: string }> = ({ verifierUrl }) 
     if (!selectedCredId && creds.length > 0) setSelectedCredId(creds[0].credId);
   }, [selectedCredId]);
 
-  const refreshBalances = async (currentReceiverDid?: string) => {
-    if (!payerDid) return;
-    const recv = currentReceiverDid ?? receiverDid;
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(receiptsStorageKey);
+      if (!raw) {
+        setReceipts([]);
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) {
+        setReceipts([]);
+        return;
+      }
+      setReceipts(parsed as PaymentReceipt[]);
+    } catch {
+      setReceipts([]);
+    }
+  }, [receiptsStorageKey]);
 
-    const [payer, recvBal] = await Promise.all([
-      PaymentClient.getBalance(paymentBaseUrl, payerDid),
-      PaymentClient.getBalance(paymentBaseUrl, recv)
-    ]);
-    setPayerBalance(payer.balance);
-    setReceiverBalance(recvBal.balance);
+  const persistReceipts = (next: PaymentReceipt[]) => {
+    setReceipts(next);
+    try {
+      localStorage.setItem(receiptsStorageKey, JSON.stringify(next));
+    } catch {
+      // ignore
+    }
   };
+
+  const clearReceipts = () => {
+    persistReceipts([]);
+  };
+
+  const bumpBalanceRefresh = () => setBalanceRefreshNonce(n => n + 1);
 
   const handleCreateIntent = async () => {
     setError('');
@@ -63,7 +92,7 @@ export const PaymentFlow: React.FC<{ verifierUrl: string }> = ({ verifierUrl }) 
     try {
       const created = await PaymentClient.createIntent(paymentBaseUrl, payerDid, receiverDid.trim(), amount);
       setIntent(created);
-      await refreshBalances(receiverDid.trim());
+      bumpBalanceRefresh();
       setMessage('Payment intent created');
     } catch (e: any) {
       setError(e?.response?.data?.message || e?.message || 'Failed to create payment intent');
@@ -127,8 +156,18 @@ export const PaymentFlow: React.FC<{ verifierUrl: string }> = ({ verifierUrl }) 
         receiverDid: confirmed.receiverDid,
         kycVerified: true
       });
-      setPayerBalance(confirmed.payerBalance);
-      setReceiverBalance(confirmed.receiverBalance);
+
+      const receipt: PaymentReceipt = {
+        id: `${confirmed.intentId}:${Date.now()}`,
+        intentId: confirmed.intentId,
+        payerDid: confirmed.payerDid,
+        receiverDid: confirmed.receiverDid,
+        amount: confirmed.amount,
+        confirmedAt: new Date().toISOString()
+      };
+      persistReceipts([receipt, ...receipts]);
+
+      bumpBalanceRefresh();
       setMessage('Payment confirmed');
     } catch (e: any) {
       setError(e?.response?.data?.message || e?.message || 'Failed to confirm payment');
@@ -260,7 +299,7 @@ export const PaymentFlow: React.FC<{ verifierUrl: string }> = ({ verifierUrl }) 
         </button>
 
         <button
-          onClick={() => refreshBalances()}
+          onClick={() => bumpBalanceRefresh()}
           disabled={isWorking || !payerDid}
           style={{
             background: '#6c757d',
@@ -279,8 +318,16 @@ export const PaymentFlow: React.FC<{ verifierUrl: string }> = ({ verifierUrl }) 
         <div><strong>Payment API:</strong> {paymentBaseUrl}</div>
         <div style={{ marginTop: '6px' }}><strong>Payer DID:</strong> {payerDid || 'N/A'}</div>
         <div style={{ marginTop: '6px' }}><strong>Intent:</strong> {intent ? `${intent.intentId} (${intent.status})` : 'N/A'}</div>
-        <div style={{ marginTop: '6px' }}><strong>Balances:</strong> payer={payerBalance ?? 'N/A'} receiver={receiverBalance ?? 'N/A'}</div>
       </div>
+
+      <BalanceDisplay
+        paymentBaseUrl={paymentBaseUrl}
+        payerDid={payerDid}
+        receiverDid={receiverDid.trim()}
+        refreshNonce={balanceRefreshNonce}
+      />
+
+      <TransactionHistory receipts={receipts} onClear={clearReceipts} />
 
       <div style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
         This demo requires an over_18 decision token. The wallet will re-use a valid token if present, otherwise it will run verification.

@@ -223,40 +223,40 @@
 ### M0.6 — Payment Demo (Days 6–7)
 
 #### Payment Service Backend
-- [ ] Create `PaymentController.java`
-- [ ] `POST /payments/intents` - create payment intent
-- [ ] `POST /payments/{id}/verify-kyc` - attach decision token
-- [ ] `POST /payments/{id}/confirm` - execute transfer
+- [x] Create `PaymentController.java`
+- [x] `POST /payments/intents` - create payment intent
+- [x] `POST /payments/{id}/verify-kyc` - attach decision token
+- [x] `POST /payments/{id}/confirm` - execute transfer
 
 #### Demo Balance Ledger
-- [ ] Create `PaymentService.java`
-- [ ] In-memory map: `DID → balance`
-- [ ] Initialize test accounts with demo balance
-- [ ] Implement `transfer(from, to, amount)`
-- [ ] Implement `getBalance(did)`
+- [x] Create `PaymentService.java`
+- [x] In-memory map: `DID → balance`
+- [x] Initialize test accounts with demo balance
+- [x] Implement `transfer(from, to, amount)`
+- [x] Implement `getBalance(did)`
 
 #### KYC Gate Logic
-- [ ] Payment intent requires decision token
-- [ ] Validate decision token:
-  - [ ] Verify signature
-  - [ ] Check not expired
-  - [ ] Verify holder matches payer
-- [ ] Reject payment if token invalid/missing
+- [x] Payment intent requires decision token
+- [x] Validate decision token:
+  - [x] Verify signature
+  - [x] Check not expired
+  - [x] Verify holder matches payer
+- [x] Reject payment if token invalid/missing
 
 #### Wallet Payment Client
-- [ ] Create `src/services/PaymentClient.ts`
-- [ ] Implement `createIntent(amount, receiverDID)`
-- [ ] Implement `attachKYC(intentId, decisionToken)`
-- [ ] Implement `confirmPayment(intentId)`
-- [ ] Implement `getBalance()`
+- [x] Create `src/services/PaymentClient.ts`
+- [x] Implement `createIntent(amount, receiverDID)`
+- [x] Implement `attachKYC(intentId, decisionToken)`
+- [x] Implement `confirmPayment(intentId)`
+- [x] Implement `getBalance()`
 
 #### UI Components
-- [ ] Create `src/ui/PaymentFlow.tsx`
-- [ ] Amount input
-- [ ] Receiver DID input (or select from contacts)
-- [ ] KYC verification step (auto-trigger if needed)
-- [ ] Confirmation screen
-- [ ] Receipt display
+- [x] Create `src/ui/PaymentFlow.tsx`
+- [x] Amount input
+- [x] Receiver DID input (or select from contacts)
+- [x] KYC verification step (auto-trigger if needed)
+- [x] Confirmation screen
+- [x] Receipt display
 - [ ] Create `src/ui/BalanceDisplay.tsx`
 - [ ] Show current balance
 - [ ] Transaction history (optional)

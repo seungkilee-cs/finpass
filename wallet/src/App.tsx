@@ -3,6 +3,7 @@ import { Onboarding } from './ui/Onboarding';
 import { StorageService } from './services/storage';
 import { IssuanceFlow } from './ui/IssuanceFlow';
 import { CredentialCard } from './ui/CredentialCard';
+import { PaymentFlow } from './ui/PaymentFlow';
 import './App.css';
 
 interface WalletInfo {
@@ -113,6 +114,8 @@ const WalletDashboard: React.FC<{ walletInfo: WalletInfo }> = ({ walletInfo }) =
           setCredentials(StorageService.getCredentials());
         }}
       />
+
+      <PaymentFlow verifierUrl={verifierUrl} />
 
       <div style={{
         background: 'white',

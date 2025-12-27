@@ -1,0 +1,533 @@
+{
+  "info": {
+    "_postman_id": "finpass-api-collection",
+    "name": "FinPass API Collection",
+    "description": "Complete API collection for FinPass decentralized identity and payment system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Issuer Service",
+      "item": [
+        {
+          "name": "Issue Credential",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"holderDid\": \"did:example:123456789\",\n  \"credentialType\": \"PASSPORT\",\n  \"credentialData\": {\n    \"passportNumber\": \"P123456789\",\n    \"fullName\": \"John Doe\",\n    \"dateOfBirth\": \"1990-01-01\",\n    \"nationality\": \"US\",\n    \"issuingCountry\": \"US\",\n    \"expirationDate\": \"2030-01-01\"\n  },\n  \"livenessProof\": {\n    \"score\": 0.95,\n    \"timestamp\": \"2023-12-27T10:00:00.000Z\",\n    \"proofData\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/issuer/credentials",
+              "host": ["{{base_url}}"],
+              "path": ["api", "issuer", "credentials"]
+            },
+            "description": "Issues a new verifiable credential to the specified holder"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Credential Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/issuer/credentials/{{credential_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "issuer", "credentials", "{{credential_id}}"]
+            },
+            "description": "Retrieves details of a specific credential by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke Credential",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/issuer/credentials/{{credential_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "issuer", "credentials", "{{credential_id}}"]
+            },
+            "description": "Revokes a previously issued credential"
+          },
+          "response": []
+        },
+        {
+          "name": "List User Credentials",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/issuer/credentials?holderDid={{holder_did}}&page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "issuer", "credentials"],
+              "query": [
+                {
+                  "key": "holderDid",
+                  "value": "{{holder_did}}"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Lists all credentials for a specific holder"
+          },
+          "response": []
+        }
+      ],
+      "description": "Credential issuance and management endpoints"
+    },
+    {
+      "name": "Verifier Service",
+      "item": [
+        {
+          "name": "Verify Credential",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"credentialJwt\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n  \"verifierDid\": \"did:example:verifier123\",\n  \"verificationType\": \"IDENTITY_VERIFICATION\",\n  \"verificationData\": {\n    \"minimumAge\": 18,\n    \"requiredFields\": [\"fullName\", \"dateOfBirth\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/verifier/verify",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verifier", "verify"]
+            },
+            "description": "Verifies a verifiable credential and returns verification results"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Verification Policy",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/verifier/policies/{{policy_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verifier", "policies", "{{policy_id}}"]
+            },
+            "description": "Retrieves a verification policy by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Verification Challenge",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"verifierDid\": \"did:example:verifier123\",\n  \"challengeType\": \"PRESENTATION\",\n  \"requestedCredentials\": [\"PASSPORT\", \"DRIVERS_LICENSE\"],\n  \"expirationTime\": \"2023-12-27T11:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/verifier/challenges",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verifier", "challenges"]
+            },
+            "description": "Creates a new verification challenge for credential presentation"
+          },
+          "response": []
+        },
+        {
+          "name": "List Verification Policies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/verifier/policies?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "verifier", "policies"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Lists all available verification policies"
+          },
+          "response": []
+        }
+      ],
+      "description": "Credential verification and policy management endpoints"
+    },
+    {
+      "name": "Payment Service",
+      "item": [
+        {
+          "name": "Initiate Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payerDid\": \"did:example:payer123\",\n  \"payeeDid\": \"did:example:payee456\",\n  \"amount\": 100.50,\n  \"currency\": \"USD\",\n  \"paymentMethod\": \"BANK_TRANSFER\",\n  \"description\": \"Payment for digital identity verification\",\n  \"metadata\": {\n    \"invoiceId\": \"INV-12345\",\n    \"orderId\": \"ORDER-67890\",\n    \"credentialId\": \"cred_123456789\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments"]
+            },
+            "description": "Creates and initiates a new payment transaction"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Payment Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/payments/{{payment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "{{payment_id}}"]
+            },
+            "description": "Retrieves details of a specific payment by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"confirmationCode\": \"CONF-123456789\",\n  \"transactionHash\": \"0x1234567890abcdef1234567890abcdef12345678\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments/{{payment_id}}/confirm",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "{{payment_id}}", "confirm"]
+            },
+            "description": "Confirms a payment after external processing"
+          },
+          "response": []
+        },
+        {
+          "name": "List User Payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/payments?payerDid={{payer_did}}&page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments"],
+              "query": [
+                {
+                  "key": "payerDid",
+                  "value": "{{payer_did}}"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Lists all payments for a specific payer"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Payment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/payments/{{payment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "{{payment_id}}"]
+            },
+            "description": "Cancels a pending payment"
+          },
+          "response": []
+        }
+      ],
+      "description": "Payment processing and management endpoints"
+    },
+    {
+      "name": "Audit Service",
+      "item": [
+        {
+          "name": "Get Audit Events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/audit/events?userIdHash={{user_id_hash}}&eventType=CREDENTIAL_ISSUED&from=2023-12-01T00:00:00.000Z&page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "audit", "events"],
+              "query": [
+                {
+                  "key": "userIdHash",
+                  "value": "{{user_id_hash}}"
+                },
+                {
+                  "key": "eventType",
+                  "value": "CREDENTIAL_ISSUED"
+                },
+                {
+                  "key": "from",
+                  "value": "2023-12-01T00:00:00.000Z"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Retrieves audit events with filtering and pagination"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Audit Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/audit/metrics?from=2023-12-01T00:00:00.000Z&to=2023-12-31T23:59:59.999Z",
+              "host": ["{{base_url}}"],
+              "path": ["api", "audit", "metrics"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2023-12-01T00:00:00.000Z"
+                },
+                {
+                  "key": "to",
+                  "value": "2023-12-31T23:59:59.999Z"
+                }
+              ]
+            },
+            "description": "Retrieves audit metrics and analytics"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Audit Logs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filters\": {\n    \"eventTypes\": [\"CREDENTIAL_ISSUED\", \"PRESENTATION_VERIFIED\"],\n    \"outcomes\": [\"SUCCESS\"],\n    \"severity\": [\"LOW\", \"MEDIUM\"]\n  },\n  \"timeRange\": {\n    \"from\": \"2023-12-01T00:00:00.000Z\",\n    \"to\": \"2023-12-31T23:59:59.999Z\"\n  },\n  \"pagination\": {\n    \"page\": 0,\n    \"size\": 50\n  },\n  \"sortBy\": \"timestamp\",\n  \"sortOrder\": \"desc\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/audit/search",
+              "host": ["{{base_url}}"],
+              "path": ["api", "audit", "search"]
+            },
+            "description": "Searches audit logs with advanced filters"
+          },
+          "response": []
+        }
+      ],
+      "description": "Audit logging and monitoring endpoints"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Pre-request script to set dynamic variables",
+          "if (!pm.variables.get('jwt_token')) {",
+          "    pm.variables.set('jwt_token', 'your-test-jwt-token-here');",
+          "}",
+          "",
+          "// Set timestamp for dynamic requests",
+          "pm.variables.set('timestamp', new Date().toISOString());",
+          "",
+          "// Generate random IDs for test data",
+          "pm.variables.set('random_id', Math.random().toString(36).substr(2, 9));",
+          "pm.variables.set('credential_id', 'cred_' + pm.variables.get('random_id'));",
+          "pm.variables.set('payment_id', 'pay_' + pm.variables.get('random_id'));",
+          "pm.variables.set('policy_id', 'policy_' + pm.variables.get('random_id'));",
+          "pm.variables.set('holder_did', 'did:example:holder' + pm.variables.get('random_id'));",
+          "pm.variables.get('payer_did', 'did:example:payer' + pm.variables.get('random_id'));",
+          "pm.variables.set('user_id_hash', 'hash_' + pm.variables.get('random_id'));"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Test script to validate responses",
+          "pm.test(\"Status code is successful\", function () {",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202]);",
+          "});",
+          "",
+          "pm.test(\"Response has valid JSON\", function () {",
+          "    pm.response.to.have.jsonBody();",
+          "});",
+          "",
+          "pm.test(\"Response time is acceptable\", function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});",
+          "",
+          "// Store credential ID from issue response for use in other requests",
+          "if (pm.request.url.path.includes('/credentials') && pm.response.code === 201) {",
+          "    const response = pm.response.json();",
+          "    if (response.credentialId) {",
+          "        pm.variables.set('last_credential_id', response.credentialId);",
+          "    }",
+          "    if (response.credentialJwt) {",
+          "        pm.variables.set('last_credential_jwt', response.credentialJwt);",
+          "    }",
+          "}",
+          "",
+          "// Store payment ID from payment response for use in other requests",
+          "if (pm.request.url.path.includes('/payments') && pm.response.code === 201) {",
+          "    const response = pm.response.json();",
+          "    if (response.paymentId) {",
+          "        pm.variables.set('last_payment_id', response.paymentId);",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "your-test-jwt-token-here",
+      "type": "string"
+    }
+  ]
+}

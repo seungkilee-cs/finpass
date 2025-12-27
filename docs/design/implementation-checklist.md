@@ -525,56 +525,56 @@
 ### M1.7 — Production Database Schema (Days 21–22)
 
 #### Users Table
-- [ ] `id` UUID PRIMARY KEY
-- [ ] `did` TEXT UNIQUE NOT NULL
-- [ ] `created_at` TIMESTAMP
-- [ ] `last_seen` TIMESTAMP
-- [ ] Index on `did`
+- [x] `id` UUID PRIMARY KEY
+- [x] `did` TEXT UNIQUE NOT NULL
+- [x] `created_at` TIMESTAMP
+- [x] `last_seen` TIMESTAMP
+- [x] Index on `did`
 
 #### Credentials Table
-- [ ] `id` UUID PRIMARY KEY
-- [ ] `user_id` UUID REFERENCES users
-- [ ] `issuer_id` TEXT
-- [ ] `credential_type` TEXT
-- [ ] `credential_jwt` TEXT (consider encryption)
-- [ ] `issued_at` TIMESTAMP
-- [ ] `expires_at` TIMESTAMP
-- [ ] `status` VARCHAR (VALID, REVOKED, SUSPENDED)
-- [ ] `revoked_at` TIMESTAMP
-- [ ] `revocation_handle` TEXT
-- [ ] Indexes on `user_id`, `status`, `issuer_id`
+- [x] `id` UUID PRIMARY KEY
+- [x] `user_id` UUID REFERENCES users
+- [x] `issuer_id` TEXT
+- [x] `credential_type` TEXT
+- [x] `credential_jwt` TEXT (consider encryption)
+- [x] `issued_at` TIMESTAMP
+- [x] `expires_at` TIMESTAMP
+- [x] `status` VARCHAR (VALID, REVOKED, SUSPENDED)
+- [x] `revoked_at` TIMESTAMP
+- [x] `revocation_handle` TEXT
+- [x] Indexes on `user_id`, `status`, `issuer_id`
 
 #### Payments Table
-- [ ] `id` UUID PRIMARY KEY
-- [ ] `payer_did` TEXT NOT NULL
-- [ ] `payee_did` TEXT NOT NULL
-- [ ] `amount` DECIMAL(18,2)
-- [ ] `currency` VARCHAR(3)
-- [ ] `status` VARCHAR (PENDING, AUTHORIZED, CAPTURED, FAILED)
-- [ ] `kyc_decision_token` TEXT
-- [ ] `created_at` TIMESTAMP
-- [ ] `completed_at` TIMESTAMP
-- [ ] Indexes on `payer_did`, `payee_did`, `status`
+- [x] `id` UUID PRIMARY KEY
+- [x] `payer_did` TEXT NOT NULL
+- [x] `payee_did` TEXT NOT NULL
+- [x] `amount` DECIMAL(18,2)
+- [x] `currency` VARCHAR(3)
+- [x] `status` VARCHAR (PENDING, AUTHORIZED, CAPTURED, FAILED)
+- [x] `kyc_decision_token` TEXT
+- [x] `created_at` TIMESTAMP
+- [x] `completed_at` TIMESTAMP
+- [x] Indexes on `payer_did`, `payee_did`, `status`
 
 #### Audit Events Table
-- [ ] `id` UUID PRIMARY KEY
-- [ ] `event_type` VARCHAR NOT NULL
-- [ ] `user_id_hash` TEXT (SHA256 of DID)
-- [ ] `details` JSONB
-- [ ] `created_at` TIMESTAMP
-- [ ] Index on `event_type`, `created_at`
+- [x] `id` UUID PRIMARY KEY
+- [x] `event_type` VARCHAR NOT NULL
+- [x] `user_id_hash` TEXT (SHA256 of DID)
+- [x] `details` JSONB
+- [x] `created_at` TIMESTAMP
+- [x] Index on `event_type`, `created_at`
 
 #### Migrations
-- [ ] Create `V1__init.sql` with base schema
-- [ ] Create `V2__audit.sql` for audit table
-- [ ] Test migrations run cleanly
-- [ ] Test rollback works
+- [x] Create `V1__init.sql` with base schema
+- [x] Create `V2__audit.sql` for audit table
+- [x] Test migrations run cleanly
+- [x] Test rollback works
 
 #### Repository Updates
-- [ ] Update `UserRepository.java`
-- [ ] Update `CredentialRepository.java`
-- [ ] Update `PaymentRepository.java`
-- [ ] Create `AuditEventRepository.java`
+- [x] Update `UserRepository.java`
+- [x] Update `CredentialRepository.java`
+- [x] Update `PaymentRepository.java`
+- [x] Create `AuditEventRepository.java`
 
 ---
 

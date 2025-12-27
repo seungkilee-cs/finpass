@@ -22,6 +22,9 @@ public class IssueWithProofRequest {
 	@NotBlank
 	private String proofSignature;
 
+	@NotNull
+	private LivenessProof livenessProof;
+
 	public String getHolderDid() {
 		return holderDid;
 	}
@@ -60,5 +63,13 @@ public class IssueWithProofRequest {
 
 	public void setProofSignature(String proofSignature) {
 		this.proofSignature = proofSignature;
+	}
+
+	public LivenessProof getLivenessProof() {
+		return livenessProof;
+	}
+
+	public void setLivenessProof(LivenessProof livenessProof) {
+		this.livenessProof = livenessProof;
 	}
 }

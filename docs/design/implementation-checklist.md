@@ -455,36 +455,36 @@
 ### M1.5 — Liveness Detection (Days 18–20)
 
 #### Frontend Integration
-- [ ] Add face-api.js or TensorFlow.js dependency
-- [ ] Load face detection model
-- [ ] Create `src/services/liveness.ts`
-- [ ] Implement `detectFace(videoFrame)` - returns bounding box
-- [ ] Implement `calculateLivenessScore(frames[])` - basic anti-spoofing
+- [x] Add face-api.js or TensorFlow.js dependency
+- [x] Load face detection model
+- [x] Create `src/services/liveness.ts`
+- [x] Implement `detectFace(videoFrame)` - returns bounding box
+- [x] Implement `calculateLivenessScore(frames[])` - basic anti-spoofing
 
 #### Liveness Check Flow
-- [ ] Capture 3-5 video frames during passport scan
-- [ ] Check face detected in frames
-- [ ] Basic motion detection (face position changes)
-- [ ] Calculate liveness score (0-1)
+- [x] Capture 3-5 video frames during passport scan
+- [x] Check face detected in frames
+- [x] Basic motion detection (face position changes)
+- [x] Calculate liveness score (0-1)
 
 #### Issuer Validation
-- [ ] Update `/issue` to accept `liveness_proof`
-- [ ] Validate liveness score > 0.7
-- [ ] Reject issuance if liveness fails
-- [ ] Log liveness check results
+- [x] Update `/issue` to accept `liveness_proof`
+- [x] Validate liveness score > 0.7
+- [x] Reject issuance if liveness fails
+- [x] Log liveness check results
 
 #### UI Components
-- [ ] Camera access permission handling
-- [ ] Video stream display
-- [ ] "Look at camera" / "Turn head slightly" prompts
-- [ ] Liveness check progress indicator
-- [ ] Success/failure feedback
+- [x] Camera access permission handling
+- [x] Video stream display
+- [x] "Look at camera" / "Turn head slightly" prompts
+- [x] Liveness check progress indicator
+- [x] Success/failure feedback
 
 #### Testing
-- [ ] Detects real face successfully
-- [ ] Rejects photo of photo (basic)
-- [ ] Works on Chrome and Safari
-- [ ] Handles camera permission denial
+- [x] Detects real face successfully
+- [x] Rejects photo of photo (basic)
+- [x] Works on Chrome and Safari
+- [x] Handles camera permission denial
 
 ---
 

@@ -25,15 +25,18 @@ public class IssuerService {
     private final UserRepository userRepository;
     private final CredentialRepository credentialRepository;
     private final LivenessValidationService livenessValidationService;
+    private final RevocationService revocationService;
 
     public IssuerService(
             UserRepository userRepository,
             CredentialRepository credentialRepository,
-            LivenessValidationService livenessValidationService
+            LivenessValidationService livenessValidationService,
+            RevocationService revocationService
     ) {
         this.userRepository = userRepository;
         this.credentialRepository = credentialRepository;
         this.livenessValidationService = livenessValidationService;
+        this.revocationService = revocationService;
     }
 
     /**
@@ -79,6 +82,9 @@ public class IssuerService {
         cred.setIssuedAt(now);
 
         credentialRepository.save(cred);
+
+        // Initialize credential status
+        revocationService.initializeCredentialStatus(cred);
 
         com.finpass.issuer.dto.IssueResponse response = new com.finpass.issuer.dto.IssueResponse();
         response.setCredentialJwt(cred.getCredentialJwt());

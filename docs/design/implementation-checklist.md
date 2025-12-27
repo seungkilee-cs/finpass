@@ -491,34 +491,34 @@
 ### M1.6 — Revocation Service (Days 20–21)
 
 #### Database Schema
-- [ ] Add `credential_status` table
-  - [ ] `credential_id` (FK)
-  - [ ] `status` (VALID, REVOKED, SUSPENDED)
-  - [ ] `revoked_at` timestamp
-  - [ ] `revocation_reason`
+- [x] Add `credential_status` table
+  - [x] `credential_id` (FK)
+  - [x] `status` (VALID, REVOKED, SUSPENDED)
+  - [x] `revoked_at` timestamp
+  - [x] `revocation_reason`
 
 #### Issuer Endpoints
-- [ ] Create `POST /revoke/{credentialId}` (admin only)
-- [ ] Validate admin authorization
-- [ ] Update credential status
-- [ ] Log revocation event
+- [x] Create `POST /revoke/{credentialId}` (admin only)
+- [x] Validate admin authorization
+- [x] Update credential status
+- [x] Log revocation event
 
 #### Status Endpoint
-- [ ] Update `GET /status/{revocationHandle}`
-- [ ] Return current status
-- [ ] Include revocation timestamp if revoked
+- [x] Update `GET /status/{revocationHandle}`
+- [x] Return current status
+- [x] Include revocation timestamp if revoked
 
 #### Verifier Integration
-- [ ] Before accepting VC, call status endpoint
-- [ ] Cache status (short TTL, e.g., 5 minutes)
-- [ ] Reject revoked credentials
-- [ ] Include status check in verification logs
+- [x] Before accepting VC, call status endpoint
+- [x] Cache status (short TTL, e.g., 5 minutes)
+- [x] Reject revoked credentials
+- [x] Include status check in verification logs
 
 #### Testing
-- [ ] Issue credential → verify works
-- [ ] Revoke credential → verify fails
-- [ ] Status endpoint returns correct data
-- [ ] Caching works correctly
+- [x] Issue credential → verify works
+- [x] Revoke credential → verify fails
+- [x] Status endpoint returns correct data
+- [x] Caching works correctly
 
 ---
 

@@ -320,4 +320,9 @@ public interface AuditEventRepository extends JpaRepository<AuditEventEntity, UU
      * Find events by API version
      */
     List<AuditEventEntity> findByApiVersion(String apiVersion);
+
+    /**
+     * Find events by user ID hash ordered by creation date descending
+     */
+    List<AuditEventEntity> findByUserIdHashOrderByCreatedAtDesc(String userIdHash);
 }

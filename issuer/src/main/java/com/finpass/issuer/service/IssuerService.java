@@ -26,17 +26,20 @@ public class IssuerService {
     private final CredentialRepository credentialRepository;
     private final LivenessValidationService livenessValidationService;
     private final RevocationService revocationService;
+    private final AuditService auditService;
 
     public IssuerService(
             UserRepository userRepository,
             CredentialRepository credentialRepository,
             LivenessValidationService livenessValidationService,
-            RevocationService revocationService
+            RevocationService revocationService,
+            AuditService auditService
     ) {
         this.userRepository = userRepository;
         this.credentialRepository = credentialRepository;
         this.livenessValidationService = livenessValidationService;
         this.revocationService = revocationService;
+        this.auditService = auditService;
     }
 
     /**
@@ -85,6 +88,10 @@ public class IssuerService {
 
         // Initialize credential status
         revocationService.initializeCredentialStatus(cred);
+
+        // Log credential issuance
+        auditService.logCredentialIssued(user.getId().toString(), cred.getId().toString(), 
+                                       "PassportCredential", "finpass-issuer");
 
         com.finpass.issuer.dto.IssueResponse response = new com.finpass.issuer.dto.IssueResponse();
         response.setCredentialJwt(cred.getCredentialJwt());

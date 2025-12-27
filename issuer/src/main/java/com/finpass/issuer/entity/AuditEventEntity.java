@@ -33,6 +33,7 @@ public class AuditEventEntity {
         CREDENTIAL_REINSTATED,
         CREDENTIAL_VERIFIED,
         CREDENTIAL_PRESENTED,
+        PRESENTATION_VERIFIED,
         
         // User Events
         USER_REGISTERED,
@@ -47,6 +48,7 @@ public class AuditEventEntity {
         PAYMENT_INITIATED,
         PAYMENT_AUTHORIZED,
         PAYMENT_CAPTURED,
+        PAYMENT_COMPLETED,
         PAYMENT_FAILED,
         PAYMENT_REFUNDED,
         PAYMENT_CANCELLED,

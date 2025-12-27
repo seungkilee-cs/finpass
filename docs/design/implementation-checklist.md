@@ -581,35 +581,35 @@
 ### M1.8 — Audit Logging (Days 22–23)
 
 #### Audit Service
-- [ ] Create `AuditService.java`
-- [ ] Implement `logEvent(type, userId, details)`
-- [ ] Hash user ID before storing (privacy)
-- [ ] Include timestamp automatically
+- [x] Create `AuditService.java`
+- [x] Implement `logEvent(type, userId, details)`
+- [x] Hash user ID before storing (privacy)
+- [x] Include timestamp automatically
 
 #### Event Types
-- [ ] `CREDENTIAL_ISSUED` - who, when, credential type
-- [ ] `CREDENTIAL_REVOKED` - who, when, reason
-- [ ] `PRESENTATION_VERIFIED` - who, when, verifier, decision
-- [ ] `PAYMENT_INITIATED` - payer, payee, amount
-- [ ] `PAYMENT_COMPLETED` - payment ID, status
-- [ ] `PAYMENT_FAILED` - payment ID, reason
+- [x] `CREDENTIAL_ISSUED` - who, when, credential type
+- [x] `CREDENTIAL_REVOKED` - who, when, reason
+- [x] `PRESENTATION_VERIFIED` - who, when, verifier, decision
+- [x] `PAYMENT_INITIATED` - payer, payee, amount
+- [x] `PAYMENT_COMPLETED` - payment ID, status
+- [x] `PAYMENT_FAILED` - payment ID, reason
 
 #### Integration Points
-- [ ] IssuerService: log on issuance
-- [ ] IssuerService: log on revocation
-- [ ] VerifierService: log on verification
-- [ ] PaymentService: log on payment events
+- [x] IssuerService: log on issuance
+- [x] IssuerService: log on revocation
+- [x] VerifierService: log on verification
+- [x] PaymentService: log on payment events
 
 #### Query Endpoints (Internal)
-- [ ] `GET /audit/events/{userHash}` - event history for user
-- [ ] `GET /audit/events?type=X&from=Y&to=Z` - filtered events
-- [ ] `GET /audit/metrics` - aggregate stats (count by type, etc.)
+- [x] `GET /audit/events/{userHash}` - event history for user
+- [x] `GET /audit/events?type=X&from=Y&to=Z` - filtered events
+- [x] `GET /audit/metrics` - aggregate stats (count by type, etc.)
 
 #### Testing
-- [ ] All flows generate audit events
-- [ ] Events contain correct data
-- [ ] User can query their events
-- [ ] Metrics endpoint works
+- [x] All flows generate audit events
+- [x] Events contain correct data
+- [x] User can query their events
+- [x] Metrics endpoint works
 
 ---
 

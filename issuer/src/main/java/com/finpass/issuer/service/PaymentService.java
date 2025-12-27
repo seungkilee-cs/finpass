@@ -2,6 +2,8 @@ package com.finpass.issuer.service;
 
 import com.finpass.issuer.entity.PaymentEntity;
 import com.finpass.issuer.repository.PaymentRepository;
+import com.finpass.issuer.validation.ValidationService;
+import com.finpass.issuer.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +28,13 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final AuditService auditService;
+    private final ValidationService validationService;
 
     @Autowired
-    public PaymentService(PaymentRepository paymentRepository, AuditService auditService) {
+    public PaymentService(PaymentRepository paymentRepository, AuditService auditService, ValidationService validationService) {
         this.paymentRepository = paymentRepository;
         this.auditService = auditService;
+        this.validationService = validationService;
     }
 
     /**
@@ -40,6 +44,27 @@ public class PaymentService {
                                        String currency, Map<String, Object> paymentDetails,
                                        HttpServletRequest request) {
         Instant now = Instant.now();
+        
+        // Validate inputs
+        ValidationService.ValidationResult paymentValidation = validationService.validatePayment(payerDid, payeeDid, amount, currency);
+        if (!paymentValidation.isValid()) {
+            throw new ValidationException(paymentValidation.getErrorCode(), paymentValidation.getErrorMessage());
+        }
+        
+        // Validate payment details
+        if (paymentDetails != null) {
+            ValidationService.ValidationResult methodValidation = validationService.validatePaymentMethod(
+                (String) paymentDetails.get("paymentMethod"));
+            if (!methodValidation.isValid()) {
+                throw new ValidationException(methodValidation.getErrorCode(), methodValidation.getErrorMessage());
+            }
+            
+            ValidationService.ValidationResult kycValidation = validationService.validateKycDecisionToken(
+                (String) paymentDetails.get("kycDecisionToken"));
+            if (!kycValidation.isValid()) {
+                throw new ValidationException(kycValidation.getErrorCode(), kycValidation.getErrorMessage());
+            }
+        }
         
         // Create payment entity
         PaymentEntity payment = new PaymentEntity();

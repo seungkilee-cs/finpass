@@ -616,21 +616,21 @@
 ### M1.9 — Error Handling (Days 23–24)
 
 #### Input Validation
-- [ ] DID format validation (`did:*` pattern)
-- [ ] JWT structure validation
-- [ ] JWT signature validation
-- [ ] JWT expiry validation
-- [ ] Amount validation (positive, reasonable range)
-- [ ] Timestamp validation (not in future)
+- [x] DID format validation (`did:*` pattern)
+- [x] JWT structure validation
+- [x] JWT signature validation
+- [x] JWT expiry validation
+- [x] Amount validation (positive, reasonable range)
+- [x] Timestamp validation (not in future)
 
 #### HTTP Error Codes
-- [ ] `400 Bad Request` - invalid input format
-- [ ] `401 Unauthorized` - invalid/missing authentication
-- [ ] `403 Forbidden` - policy violation (e.g., untrusted issuer)
-- [ ] `404 Not Found` - resource doesn't exist
-- [ ] `409 Conflict` - duplicate resource
-- [ ] `410 Gone` - credential revoked
-- [ ] `500 Internal Server Error` - unexpected errors
+- [x] `400 Bad Request` - invalid input format
+- [x] `401 Unauthorized` - invalid/missing authentication
+- [x] `403 Forbidden` - policy violation (e.g., untrusted issuer)
+- [x] `404 Not Found` - resource doesn't exist
+- [x] `409 Conflict` - duplicate resource
+- [x] `410 Gone` - credential revoked
+- [x] `500 Internal Server Error` - unexpected errors
 
 #### Error Response Format
 ```json
@@ -640,57 +640,57 @@
   "timestamp": "ISO timestamp"
 }
 ```
-- [ ] Implement `GlobalExceptionHandler.java`
-- [ ] Map exceptions to error responses
-- [ ] Include correlation ID for debugging
+- [x] Implement `GlobalExceptionHandler.java`
+- [x] Map exceptions to error responses
+- [x] Include correlation ID for debugging
 
 #### Frontend Error Handling
-- [ ] Create `src/services/errorHandler.ts`
-- [ ] Parse API error responses
-- [ ] Display user-friendly error messages
-- [ ] Retry logic for transient errors
-- [ ] Graceful degradation
+- [x] Create `src/services/errorHandler.ts`
+- [x] Parse API error responses
+- [x] Display user-friendly error messages
+- [x] Retry logic for transient errors
+- [x] Graceful degradation
 
 #### Testing
-- [ ] Each endpoint tested with invalid inputs
-- [ ] Proper error codes returned
-- [ ] Error messages are helpful but not leaky
+- [x] Each endpoint tested with invalid inputs
+- [x] Proper error codes returned
+- [x] Error messages are helpful but not leaky
 
 ---
 
 ### M1.10 — API Documentation (Days 24–25)
 
 #### OpenAPI 3.0 Specification
-- [ ] Create `openapi.yaml`
-- [ ] Document all issuer endpoints
-- [ ] Document all verifier endpoints
-- [ ] Document all payment endpoints
-- [ ] Request/response schemas
-- [ ] Authentication requirements
-- [ ] Error response schemas
+- [x] Create `openapi.yaml`
+- [x] Document all issuer endpoints
+- [x] Document all verifier endpoints
+- [x] Document all payment endpoints
+- [x] Request/response schemas
+- [x] Authentication requirements
+- [x] Error response schemas
 
 #### Swagger UI
-- [ ] Add springdoc-openapi dependency
-- [ ] Configure Swagger UI endpoint
-- [ ] Test interactive documentation
-- [ ] Enable "Try it out" functionality
+- [x] Add springdoc-openapi dependency
+- [x] Configure Swagger UI endpoint
+- [x] Test interactive documentation
+- [x] Enable "Try it out" functionality
 
 #### README Documentation
-- [ ] Project overview and goals
-- [ ] Architecture diagram
-- [ ] Prerequisites and dependencies
-- [ ] Local setup instructions
-- [ ] Docker setup instructions
-- [ ] API overview with examples
-- [ ] Demo walkthrough
-- [ ] Troubleshooting guide
+- [x] Project overview and goals
+- [x] Architecture diagram
+- [x] Prerequisites and dependencies
+- [x] Local setup instructions
+- [x] Docker setup instructions
+- [x] API overview with examples
+- [x] Demo walkthrough
+- [x] Troubleshooting guide
 
 #### Architecture Diagrams
-- [ ] High-level system diagram
-- [ ] Credential issuance flow
-- [ ] Verification flow
-- [ ] Payment flow
-- [ ] Data flow diagram
+- [x] High-level system diagram
+- [x] Credential issuance flow
+- [x] Verification flow
+- [x] Payment flow
+- [x] Data flow diagram
 
 ---
 

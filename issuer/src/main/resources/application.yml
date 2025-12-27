@@ -1,0 +1,132 @@
+# Spring Boot Application Configuration
+spring.application.name=finpass-issuer
+server.port=8080
+
+# Database Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/finpass
+spring.datasource.username=finpass
+spring.datasource.password=finpass_password
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# JPA Configuration
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.format_sql=true
+
+# Flyway Migration
+spring.flyway.enabled=true
+spring.flyway.baseline-on-migrate=true
+spring.flyway.locations=classpath:db/migration
+
+# Security Configuration
+spring.security.oauth2.resourceserver.jwt.issuer-uri=https://auth.finpass.io
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://auth.finpass.io/.well-known/jwks.json
+
+# OpenAPI/Swagger Configuration
+springdoc.api-docs.path=/api-docs
+springdoc.api-docs.enabled=true
+springdoc.swagger-ui.enabled=true
+springdoc.swagger-ui.path=/swagger-ui.html
+springdoc.swagger-ui.operationsSorter=method
+springdoc.swagger-ui.tagsSorter=alpha
+springdoc.swagger-ui.tryItOutEnabled=true
+springdoc.swagger-ui.filter=true
+springdoc.swagger-ui.displayRequestDuration=true
+springdoc.swagger-ui.defaultModelsExpandDepth=1
+springdoc.swagger-ui.defaultModelExpandDepth=1
+
+# OpenAPI Info Configuration
+springdoc.info.title=FinPass API
+springdoc.info.description=FinPass decentralized identity and payment system API
+springdoc.info.version=1.0.0
+springdoc.info.contact.name=FinPass API Team
+springdoc.info.contact.email=api-support@finpass.io
+springdoc.info.contact.url=https://finpass.io/support
+springdoc.info.license.name=MIT
+springdoc.info.license.url=https://opensource.org/licenses/MIT
+
+# Server Configuration for Documentation
+springdoc.servers[0].url=https://api.finpass.io
+springdoc.servers[0].description=Production server
+springdoc.servers[1].url=https://staging-api.finpass.io
+springdoc.servers[1].description=Staging server
+springdoc.servers[2].url=http://localhost:8080
+springdoc.servers[2].description=Development server
+
+# Security Configuration for OpenAPI
+springdoc.swagger-ui.oauth.clientId=finpass-client
+springdoc.swagger-ui.oauth.clientSecret=finpass-secret
+springdoc.swagger-ui.oauth.realm=finpass
+springdoc.swagger-ui.oauth.appName=FinPass API
+
+# Package Scanning for Controllers
+springdoc.packages-to-scan=com.finpass.issuer.controller
+springdoc.paths-to-match=/api/**
+
+# Response Configuration
+springdoc.default-produces-media-type=application/json
+springdoc.default-consumes-media-type=application/json
+
+# Global Response Headers
+springdoc.global-responses[GET].description=Global GET response
+springdoc.global-responses[GET].content.application/json.schema.type=string
+springdoc.global-responses[GET].content.application/json.schema.example=Global GET response example
+
+springdoc.global-responses[POST].description=Global POST response
+springdoc.global-responses[POST].content.application/json.schema.type=string
+springdoc.global-responses[POST].content.application/json.schema.example=Global POST response example
+
+springdoc.global-responses[PUT].description=Global PUT response
+springdoc.global-responses[PUT].content.application/json.schema.type=string
+springdoc.global-responses[PUT].content.application/json.schema.example=Global PUT response example
+
+springdoc.global-responses[DELETE].description=Global DELETE response
+springdoc.global-responses[DELETE].content.application/json.schema.type=string
+springdoc.global-responses[DELETE].content.application/json.schema.example=Global DELETE response example
+
+# Group Configuration
+springdoc.group-configs[0].group=Issuer
+springdoc.group-configs[0].paths-to-match=/api/issuer/**
+springdoc.group-configs[0].display-name=Credential Issuer API
+springdoc.group-configs[0].description=API endpoints for credential issuance and management
+
+springdoc.group-configs[1].group=Verifier
+springdoc.group-configs[1].paths-to-match=/api/verifier/**
+springdoc.group-configs[1].display-name=Credential Verifier API
+springdoc.group-configs[1].description=API endpoints for credential verification
+
+springdoc.group-configs[2].group=Payment
+springdoc.group-configs[2].paths-to-match=/api/payments/**
+springdoc.group-configs[2].display-name=Payment API
+springdoc.group-configs[2].description=API endpoints for payment processing
+
+springdoc.group-configs[3].group=Audit
+springdoc.group-configs[3].paths-to-match=/api/audit/**
+springdoc.group-configs[3].display-name=Audit API
+springdoc.group-configs[3].description=API endpoints for audit logging and analytics
+
+# CORS Configuration
+spring.web.cors.allowed-origins=http://localhost:3000,http://localhost:8081
+spring.web.cors.allowed-methods=GET,POST,PUT,DELETE,OPTIONS
+spring.web.cors.allowed-headers=*
+spring.web.cors.allow-credentials=true
+
+# Logging Configuration
+logging.level.com.finpass=INFO
+logging.level.org.springframework.security=DEBUG
+logging.level.org.hibernate.SQL=DEBUG
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+logging.pattern.file=%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+
+# Management Endpoints
+management.endpoints.web.exposure.include=health,info,metrics,prometheus
+management.endpoint.health.show-details=when-authorized
+management.info.env.enabled=true
+
+# Actuator Info
+info.app.name=FinPass Issuer Service
+info.app.description=Decentralized identity credential issuance service
+info.app.version=1.0.0
+info.app.encoding=UTF-8
+info.app.java.version=17

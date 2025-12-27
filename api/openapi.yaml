@@ -1,0 +1,980 @@
+openapi: 3.0.3
+info:
+  title: FinPass API
+  description: |
+    FinPass is a decentralized identity and payment system built on blockchain technology.
+    This API provides endpoints for credential issuance, verification, payments, and audit logging.
+    
+    ## Key Features
+    - **Decentralized Identity**: DID-based identity management
+    - **Verifiable Credentials**: W3C-compliant credential issuance and verification
+    - **Secure Payments**: Blockchain-based payment processing
+    - **Audit Logging**: Comprehensive audit trail for compliance
+    - **Error Handling**: Standardized error responses with correlation tracking
+    
+    ## Authentication
+    The API uses JWT-based authentication for secure access to protected endpoints.
+    Include the JWT token in the Authorization header:
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+    
+    ## Rate Limiting
+    API requests are rate-limited to ensure fair usage and prevent abuse.
+    
+    ## Correlation IDs
+    All error responses include a correlation ID for debugging and support.
+    
+    ## Environment
+    - **Production**: `https://api.finpass.io`
+    - **Staging**: `https://staging-api.finpass.io`
+    - **Development**: `http://localhost:8080`
+  version: 1.0.0
+  contact:
+    name: FinPass API Team
+    email: api-support@finpass.io
+    url: https://finpass.io/support
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: https://api.finpass.io
+    description: Production server
+  - url: https://staging-api.finpass.io
+    description: Staging server
+  - url: http://localhost:8080
+    description: Development server
+
+# Security Schemes
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT authentication token
+
+  # Reusable Schemas
+  schemas:
+    # Common Schemas
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - error_description
+        - timestamp
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: "VALIDATION_FAILED"
+        error_description:
+          type: string
+          description: Human-readable error description
+          example: "Request validation failed"
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp
+          example: "2023-12-27T10:00:00.000Z"
+        correlation_id:
+          type: string
+          description: Unique correlation ID for debugging
+          example: "abc123def456"
+        path:
+          type: string
+          description: Request path
+          example: "/api/issuer/credentials"
+        details:
+          type: object
+          description: Additional error details
+          example:
+            field: "did"
+            message: "Invalid DID format"
+
+    # DID and Identity Schemas
+    Did:
+      type: string
+      description: Decentralized Identifier
+      pattern: "^did:[a-z0-9]+:[a-zA-Z0-9._-]+$"
+      example: "did:example:123456789abcdefghi"
+
+    # Credential Schemas
+    CredentialRequest:
+      type: object
+      required:
+        - holderDid
+        - credentialType
+        - credentialData
+      properties:
+        holderDid:
+          $ref: "#/components/schemas/Did"
+        credentialType:
+          type: string
+          description: Type of credential to issue
+          enum: ["PASSPORT", "DRIVERS_LICENSE", "NATIONAL_ID", "RESIDENCE_PERMIT"]
+          example: "PASSPORT"
+        credentialData:
+          type: object
+          description: Credential-specific data
+          example:
+            passportNumber: "P123456789"
+            fullName: "John Doe"
+            dateOfBirth: "1990-01-01"
+            nationality: "US"
+            issuingCountry: "US"
+            expirationDate: "2030-01-01"
+        livenessProof:
+          $ref: "#/components/schemas/LivenessProof"
+
+    LivenessProof:
+      type: object
+      required:
+        - score
+        - timestamp
+        - proofData
+      properties:
+        score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Liveness detection confidence score
+          example: 0.95
+        timestamp:
+          type: string
+          format: date-time
+          description: When liveness proof was generated
+          example: "2023-12-27T10:00:00.000Z"
+        proofData:
+          type: string
+          description: Base64-encoded liveness proof data
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    CredentialResponse:
+      type: object
+      required:
+        - credentialId
+        - credentialJwt
+        - status
+        - issuedAt
+      properties:
+        credentialId:
+          type: string
+          format: uuid
+          description: Unique credential identifier
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        credentialJwt:
+          type: string
+          description: JWT-encoded verifiable credential
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        status:
+          type: string
+          enum: ["ISSUED", "REVOKED", "SUSPENDED", "EXPIRED"]
+          example: "ISSUED"
+        issuedAt:
+          type: string
+          format: date-time
+          description: When credential was issued
+          example: "2023-12-27T10:00:00.000Z"
+        expiresAt:
+          type: string
+          format: date-time
+          description: When credential expires
+          example: "2030-12-27T10:00:00.000Z"
+        revocationId:
+          type: string
+          description: Credential revocation identifier
+          example: "rev_123456789"
+
+    # Verification Schemas
+    VerificationRequest:
+      type: object
+      required:
+        - credentialJwt
+        - verifierDid
+        - verificationType
+      properties:
+        credentialJwt:
+          type: string
+          description: JWT-encoded verifiable credential to verify
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        verifierDid:
+          $ref: "#/components/schemas/Did"
+        verificationType:
+          type: string
+          enum: ["AGE_VERIFICATION", "IDENTITY_VERIFICATION", "ADDRESS_VERIFICATION", "CUSTOM"]
+          example: "AGE_VERIFICATION"
+        verificationData:
+          type: object
+          description: Additional verification parameters
+          example:
+            minimumAge: 18
+            requiredFields: ["fullName", "dateOfBirth"]
+
+    VerificationResponse:
+      type: object
+      required:
+        - valid
+        - verifiedAt
+        - verificationResult
+      properties:
+        valid:
+          type: boolean
+          description: Whether verification passed
+          example: true
+        verifiedAt:
+          type: string
+          format: date-time
+          description: When verification was performed
+          example: "2023-12-27T10:00:00.000Z"
+        verificationResult:
+          type: object
+          description: Detailed verification results
+          properties:
+            credentialStatus:
+              type: string
+              enum: ["VALID", "REVOKED", "EXPIRED", "INVALID"]
+              example: "VALID"
+            issuerVerified:
+              type: boolean
+              description: Whether issuer is trusted
+              example: true
+            claimsVerified:
+              type: object
+              additionalProperties:
+                type: boolean
+              description: Which claims were verified
+              example:
+                fullName: true
+                dateOfBirth: true
+                nationality: true
+            verificationScore:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+              description: Overall verification confidence score
+              example: 0.98
+
+    # Payment Schemas
+    PaymentRequest:
+      type: object
+      required:
+        - payerDid
+        - payeeDid
+        - amount
+        - currency
+      properties:
+        payerDid:
+          $ref: "#/components/schemas/Did"
+        payeeDid:
+          $ref: "#/components/schemas/Did"
+        amount:
+          type: number
+          format: decimal
+          minimum: 0.01
+          maximum: 999999999.99
+          description: Payment amount
+          example: 100.50
+        currency:
+          type: string
+          pattern: "^[A-Z]{3}$"
+          description: ISO 4217 currency code
+          example: "USD"
+        paymentMethod:
+          type: string
+          enum: ["CREDIT_CARD", "DEBIT_CARD", "BANK_TRANSFER", "DIGITAL_WALLET", "CRYPTOCURRENCY"]
+          example: "BANK_TRANSFER"
+        description:
+          type: string
+          description: Payment description
+          example: "Payment for digital identity verification"
+        metadata:
+          type: object
+          description: Additional payment metadata
+          example:
+            invoiceId: "INV-12345"
+            orderId: "ORDER-67890"
+
+    PaymentResponse:
+      type: object
+      required:
+        - paymentId
+        - status
+        - createdAt
+        - amount
+        - currency
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+          description: Unique payment identifier
+          example: "pay_123e4567-e89b-12d3-a456-426614174000"
+        transactionId:
+          type: string
+          description: Blockchain transaction identifier
+          example: "0x1234567890abcdef1234567890abcdef12345678"
+        status:
+          type: string
+          enum: ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "CANCELLED", "REFUNDED"]
+          example: "COMPLETED"
+        createdAt:
+          type: string
+          format: date-time
+          description: When payment was created
+          example: "2023-12-27T10:00:00.000Z"
+        completedAt:
+          type: string
+          format: date-time
+          description: When payment was completed
+          example: "2023-12-27T10:05:00.000Z"
+        amount:
+          type: number
+          format: decimal
+          description: Payment amount
+          example: 100.50
+        currency:
+          type: string
+          description: Payment currency
+          example: "USD"
+        fee:
+          type: number
+          format: decimal
+          description: Transaction fee
+          example: 0.50
+        blockchainConfirmation:
+          type: integer
+          description: Number of blockchain confirmations
+          example: 12
+
+    # Audit Schemas
+    AuditEvent:
+      type: object
+      required:
+        - eventId
+        - eventType
+        - userIdHash
+        - timestamp
+        - outcome
+      properties:
+        eventId:
+          type: string
+          format: uuid
+          description: Unique event identifier
+          example: "evt_123e4567-e89b-12d3-a456-426614174000"
+        eventType:
+          type: string
+          enum: ["CREDENTIAL_ISSUED", "CREDENTIAL_REVOKED", "PRESENTATION_VERIFIED", "PAYMENT_COMPLETED", "USER_LOGIN", "SECURITY_ALERT", "SYSTEM_ERROR"]
+          example: "CREDENTIAL_ISSUED"
+        userIdHash:
+          type: string
+          description: Hashed user identifier for privacy
+          example: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
+        timestamp:
+          type: string
+          format: date-time
+          description: When event occurred
+          example: "2023-12-27T10:00:00.000Z"
+        outcome:
+          type: string
+          enum: ["SUCCESS", "FAILURE", "PARTIAL"]
+          example: "SUCCESS"
+        severity:
+          type: string
+          enum: ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+          example: "LOW"
+        ipAddress:
+          type: string
+          format: ipv4
+          description: Client IP address
+          example: "192.168.1.100"
+        userAgent:
+          type: string
+          description: Client user agent
+          example: "FinPass-App/1.0.0"
+        sessionId:
+          type: string
+          description: Session identifier
+          example: "sess_123456789"
+        details:
+          type: object
+          description: Event-specific details
+          example:
+            credentialId: "cred_123456789"
+            credentialType: "PASSPORT"
+            issuerDid: "did:example:issuer123"
+
+    # Pagination Schemas
+    PaginatedResponse:
+      type: object
+      required:
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+      properties:
+        content:
+          type: array
+          items:
+            type: object
+          description: Page content
+        page:
+          type: integer
+          minimum: 0
+          description: Current page number (0-based)
+          example: 0
+        size:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Page size
+          example: 20
+        totalElements:
+          type: integer
+          minimum: 0
+          description: Total number of elements
+          example: 150
+        totalPages:
+          type: integer
+          minimum: 0
+          description: Total number of pages
+          example: 8
+        first:
+          type: boolean
+          description: Whether this is the first page
+          example: true
+        last:
+          type: boolean
+          description: Whether this is the last page
+          example: false
+
+# API Paths
+paths:
+  # Issuer Endpoints
+  /api/issuer/credentials:
+    post:
+      tags:
+        - Issuer
+      summary: Issue a new credential
+      description: Issues a new verifiable credential to the specified holder after validation
+      operationId: issueCredential
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CredentialRequest"
+            examples:
+              passport:
+                summary: Issue passport credential
+                value:
+                  holderDid: "did:example:123456789abcdefghi"
+                  credentialType: "PASSPORT"
+                  credentialData:
+                    passportNumber: "P123456789"
+                    fullName: "John Doe"
+                    dateOfBirth: "1990-01-01"
+                    nationality: "US"
+                    issuingCountry: "US"
+                    expirationDate: "2030-01-01"
+                  livenessProof:
+                    score: 0.95
+                    timestamp: "2023-12-27T10:00:00.000Z"
+                    proofData: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '201':
+          description: Credential issued successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredentialResponse"
+              examples:
+                success:
+                  summary: Credential issued
+                  value:
+                    credentialId: "123e4567-e89b-12d3-a456-426614174000"
+                    credentialJwt: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    status: "ISSUED"
+                    issuedAt: "2023-12-27T10:00:00.000Z"
+                    expiresAt: "2030-12-27T10:00:00.000Z"
+                    revocationId: "rev_123456789"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '429':
+          $ref: "#/components/responses/TooManyRequests"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/issuer/credentials/{credentialId}:
+    get:
+      tags:
+        - Issuer
+      summary: Get credential details
+      description: Retrieves details of a specific credential by ID
+      operationId: getCredential
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: credentialId
+          in: path
+          required: true
+          description: Credential identifier
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Credential details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredentialResponse"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+
+    delete:
+      tags:
+        - Issuer
+      summary: Revoke a credential
+      description: Revokes a previously issued credential
+      operationId: revokeCredential
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: credentialId
+          in: path
+          required: true
+          description: Credential identifier to revoke
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Credential revoked successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Credential revoked successfully"
+                  revokedAt:
+                    type: string
+                    format: date-time
+                    example: "2023-12-27T10:00:00.000Z"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '410':
+          description: Credential already revoked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+
+  # Verifier Endpoints
+  /api/verifier/verify:
+    post:
+      tags:
+        - Verifier
+      summary: Verify a credential
+      description: Verifies a verifiable credential and returns verification results
+      operationId: verifyCredential
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerificationRequest"
+            examples:
+              ageVerification:
+                summary: Verify age credential
+                value:
+                  credentialJwt: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  verifierDid: "did:example:verifier123"
+                  verificationType: "AGE_VERIFICATION"
+                  verificationData:
+                    minimumAge: 18
+                    requiredFields: ["fullName", "dateOfBirth"]
+      responses:
+        '200':
+          description: Credential verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationResponse"
+              examples:
+                valid:
+                  summary: Verification passed
+                  value:
+                    valid: true
+                    verifiedAt: "2023-12-27T10:00:00.000Z"
+                    verificationResult:
+                      credentialStatus: "VALID"
+                      issuerVerified: true
+                      claimsVerified:
+                        fullName: true
+                        dateOfBirth: true
+                        nationality: true
+                      verificationScore: 0.98
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '429':
+          $ref: "#/components/responses/TooManyRequests"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+
+  # Payment Endpoints
+  /api/payments:
+    post:
+      tags:
+        - Payment
+      summary: Initiate a new payment
+      description: Creates and initiates a new payment transaction
+      operationId: initiatePayment
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+            examples:
+              bankTransfer:
+                summary: Bank transfer payment
+                value:
+                  payerDid: "did:example:payer123"
+                  payeeDid: "did:example:payee456"
+                  amount: 100.50
+                  currency: "USD"
+                  paymentMethod: "BANK_TRANSFER"
+                  description: "Payment for digital identity verification"
+                  metadata:
+                    invoiceId: "INV-12345"
+                    orderId: "ORDER-67890"
+      responses:
+        '201':
+          description: Payment initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentResponse"
+              examples:
+                initiated:
+                  summary: Payment initiated
+                  value:
+                    paymentId: "pay_123e4567-e89b-12d3-a456-426614174000"
+                    status: "PENDING"
+                    createdAt: "2023-12-27T10:00:00.000Z"
+                    amount: 100.50
+                    currency: "USD"
+                    fee: 0.50
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '429':
+          $ref: "#/components/responses/TooManyRequests"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/payments/{paymentId}:
+    get:
+      tags:
+        - Payment
+      summary: Get payment details
+      description: Retrieves details of a specific payment by ID
+      operationId: getPayment
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          description: Payment identifier
+          schema:
+            type: string
+            format: uuid
+          example: "pay_123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Payment details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentResponse"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+
+  # Audit Endpoints
+  /api/audit/events:
+    get:
+      tags:
+        - Audit
+      summary: Get audit events
+      description: Retrieves audit events with filtering and pagination
+      operationId: getAuditEvents
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userIdHash
+          in: query
+          description: Filter by user ID hash
+          schema:
+            type: string
+          example: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
+        - name: eventType
+          in: query
+          description: Filter by event type
+          schema:
+            type: string
+            enum: ["CREDENTIAL_ISSUED", "CREDENTIAL_REVOKED", "PRESENTATION_VERIFIED", "PAYMENT_COMPLETED", "USER_LOGIN", "SECURITY_ALERT", "SYSTEM_ERROR"]
+          example: "CREDENTIAL_ISSUED"
+        - name: from
+          in: query
+          description: Filter events from this timestamp
+          schema:
+            type: string
+            format: date-time
+          example: "2023-12-01T00:00:00.000Z"
+        - name: to
+          in: query
+          description: Filter events to this timestamp
+          schema:
+            type: string
+            format: date-time
+          example: "2023-12-31T23:59:59.999Z"
+        - name: page
+          in: query
+          description: Page number (0-based)
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          example: 0
+        - name: size
+          in: query
+          description: Page size
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+      responses:
+        '200':
+          description: Audit events retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginatedResponse"
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/AuditEvent"
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+
+  /api/audit/metrics:
+    get:
+      tags:
+        - Audit
+      summary: Get audit metrics
+      description: Retrieves audit metrics and analytics
+      operationId: getAuditMetrics
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          description: Metrics from this timestamp
+          schema:
+            type: string
+            format: date-time
+          required: true
+          example: "2023-12-01T00:00:00.000Z"
+        - name: to
+          in: query
+          description: Metrics to this timestamp
+          schema:
+            type: string
+            format: date-time
+          required: true
+          example: "2023-12-31T23:59:59.999Z"
+      responses:
+        '200':
+          description: Audit metrics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  period:
+                    type: object
+                    properties:
+                      from:
+                        type: string
+                        format: date-time
+                      to:
+                        type: string
+                        format: date-time
+                  totalEvents:
+                    type: integer
+                    example: 15000
+                  eventsByType:
+                    type: object
+                    additionalProperties:
+                      type: integer
+                    example:
+                      CREDENTIAL_ISSUED: 5000
+                      PRESENTATION_VERIFIED: 3000
+                      PAYMENT_COMPLETED: 2000
+                      SECURITY_ALERT: 100
+                  errorRate:
+                    type: number
+                    format: float
+                    minimum: 0
+                    maximum: 1
+                    example: 0.02
+                  criticalEvents:
+                    type: integer
+                    example: 5
+        '400':
+          $ref: "#/components/responses/BadRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+
+# Common Responses
+components:
+  responses:
+    BadRequest:
+      description: Bad request - invalid input parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "BAD_REQUEST"
+            error_description: "Request validation failed"
+            timestamp: "2023-12-27T10:00:00.000Z"
+            correlation_id: "abc123def456"
+            path: "/api/issuer/credentials"
+
+    Unauthorized:
+      description: Unauthorized - authentication required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "UNAUTHORIZED"
+            error_description: "Authentication is required to access this resource"
+            timestamp: "2023-12-27T10:00:00.000Z"
+            correlation_id: "abc123def456"
+            path: "/api/issuer/credentials"
+
+    Forbidden:
+      description: Forbidden - insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "FORBIDDEN"
+            error_description: "You do not have permission to perform this action"
+            timestamp: "2023-12-27T10:00:00.000Z"
+            correlation_id: "abc123def456"
+            path: "/api/issuer/credentials"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "NOT_FOUND"
+            error_description: "The requested resource was not found"
+            timestamp: "2023-12-27T10:00:00.000Z"
+            correlation_id: "abc123def456"
+            path: "/api/issuer/credentials/123"
+
+    TooManyRequests:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "RATE_LIMIT_EXCEEDED"
+            error_description: "Too many requests. Please try again later."
+            timestamp: "2023-12-27T10:00:00.000Z"
+            correlation_id: "abc123def456"
+            path: "/api/issuer/credentials"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: "INTERNAL_SERVER_ERROR"
+            error_description: "An unexpected error occurred. Please try again later."
+            timestamp: "2023-12-27T10:00:00.000Z"
+            correlation_id: "abc123def456"
+            path: "/api/issuer/credentials"
+
+# Tags
+tags:
+  - name: Issuer
+    description: Credential issuance and management operations
+  - name: Verifier
+    description: Credential verification operations
+  - name: Payment
+    description: Payment processing operations
+  - name: Audit
+    description: Audit logging and analytics operations

@@ -22,6 +22,8 @@ public class VerifierService {
 	private final TrustedIssuers trustedIssuers;
 	private final VerifierKeyProvider keyProvider;
 	private final ChallengeStore challengeStore;
+	private final BlockchainService blockchainService;
+	private final TrustRegistryService trustRegistryService;
 	private final String verifierDid;
 	private final long decisionTtlSeconds;
 
@@ -29,12 +31,16 @@ public class VerifierService {
 			TrustedIssuers trustedIssuers,
 			VerifierKeyProvider keyProvider,
 			ChallengeStore challengeStore,
+			BlockchainService blockchainService,
+			TrustRegistryService trustRegistryService,
 			@Value("${verifier.did}") String verifierDid,
 			@Value("${decision.ttlSeconds:300}") long decisionTtlSeconds
 	) {
 		this.trustedIssuers = trustedIssuers;
 		this.keyProvider = keyProvider;
 		this.challengeStore = challengeStore;
+		this.blockchainService = blockchainService;
+		this.trustRegistryService = trustRegistryService;
 		this.verifierDid = verifierDid;
 		this.decisionTtlSeconds = decisionTtlSeconds;
 	}
@@ -51,8 +57,27 @@ public class VerifierService {
 		challengeStore.consumeOrThrow(request.getChallenge());
 
 		String issuerDid = verifyCommitmentJwtOrThrow(request);
+		
+		// Check if issuer is trusted locally
 		if (!trustedIssuers.isTrusted(issuerDid)) {
 			throw new IllegalArgumentException("Untrusted issuer");
+		}
+		
+		// Additional blockchain verification
+		if (!blockchainService.verifyIssuerOnChain(issuerDid)) {
+			throw new IllegalArgumentException("Issuer not registered on blockchain");
+		}
+		
+		// Check trust registry on-chain with fallback to cache
+		boolean isTrustedOnRegistry = false;
+		try {
+			isTrustedOnRegistry = trustRegistryService.isTrustedIssuer(issuerDid);
+			if (!isTrustedOnRegistry) {
+				throw new IllegalArgumentException("Issuer not found in trust registry");
+			}
+		} catch (Exception e) {
+			// Log the error but don't fail verification if trust registry is unavailable
+			System.err.println("Trust registry check failed, proceeding with verification: " + e.getMessage());
 		}
 
 		List<String> verifiedClaims = validateProofPoC(request);

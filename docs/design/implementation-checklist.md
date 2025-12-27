@@ -316,25 +316,25 @@
 ### M1.1 — Blockchain DID Registry (Days 8–10)
 
 #### Smart Contract
-- [ ] Create `contracts/DIDRegistry.sol`
-- [ ] `registerDID(didHash, publicKeyJWK, timestamp)` function
-- [ ] `verifyDIDAt(didHash, timestamp)` view function
-- [ ] `getDIDInfo(didHash)` view function
-- [ ] Events: `DIDRegistered`, `DIDUpdated`
+- [x] Create `contracts/DIDRegistry.sol`
+- [x] `registerDID(didHash, publicKeyJWK, timestamp)` function
+- [x] `verifyDIDAt(didHash, timestamp)` view function
+- [x] `getDIDInfo(didHash)` view function
+- [x] Events: `DIDRegistered`, `DIDUpdated`
 - [ ] Deploy to Polygon Mumbai testnet
 
 #### Java Integration
-- [ ] Add web3j dependency
-- [ ] Create `BlockchainConfig.java` - RPC URL, contract address
-- [ ] Create `BlockchainService.java`
-- [ ] Implement `publishIssuerKey(did, publicKey)` - write transaction
-- [ ] Implement `verifyIssuerOnChain(did)` - read from contract
-- [ ] Handle transaction confirmation
+- [x] Add web3j dependency
+- [x] Create `BlockchainConfig.java` - RPC URL, contract address
+- [x] Create `BlockchainService.java`
+- [x] Implement `publishIssuerKey(did, publicKey)` - write transaction
+- [x] Implement `verifyIssuerOnChain(did)` - read from contract
+- [x] Handle transaction confirmation
 
 #### Backend Integration
-- [ ] On issuer startup: publish issuer DID to chain (if not exists)
-- [ ] On verification: check if issuer DID registered on-chain
-- [ ] Log blockchain transaction hashes
+- [x] On issuer startup: publish issuer DID to chain (if not exists)
+- [x] On verification: check if issuer DID registered on-chain
+- [x] Log blockchain transaction hashes
 
 #### Testing
 - [ ] Deploy contract to testnet
@@ -347,55 +347,55 @@
 ### M1.2 — Trust Registry On-Chain (Days 10–12)
 
 #### Smart Contract
-- [ ] Create `contracts/TrustRegistry.sol`
-- [ ] Admin address for management
-- [ ] `addIssuer(issuerDID, assuranceLevel, metadata)` (admin only)
-- [ ] `removeIssuer(issuerDID)` (admin only)
-- [ ] `isTrusted(issuerDID, atTimestamp)` view function
-- [ ] Events: `IssuerAdded`, `IssuerRemoved`
+- [x] Create `contracts/TrustRegistry.sol`
+- [x] Admin address for management
+- [x] `addIssuer(issuerDID, assuranceLevel, metadata)` (admin only)
+- [x] `removeIssuer(issuerDID)` (admin only)
+- [x] `isTrusted(issuerDID, atTimestamp)` view function
+- [x] Events: `IssuerAdded`, `IssuerRemoved`
 - [ ] Deploy to Polygon Mumbai testnet
 
 #### Java Integration
-- [ ] Create `TrustRegistryService.java`
-- [ ] Implement `addIssuer(issuerDID, level)` - admin function
-- [ ] Implement `isTrustedIssuer(issuerDID)` - query contract
-- [ ] Cache registry entries (1 hour TTL)
-- [ ] Cache invalidation on events
+- [x] Create `TrustRegistryService.java`
+- [x] Implement `addIssuer(issuerDID, level)` - admin function
+- [x] Implement `isTrustedIssuer(issuerDID)` - query contract
+- [x] Cache registry entries (1 hour TTL)
+- [x] Cache invalidation on events
 
 #### Verifier Integration
-- [ ] Update `VerifierService` to check on-chain trust registry
-- [ ] Fall back to cached value if chain unavailable
-- [ ] Log trust registry lookups
+- [x] Update `VerifierService` to check on-chain trust registry
+- [x] Fall back to cached value if chain unavailable
+- [x] Log trust registry lookups
 
 #### Testing
-- [ ] Add issuer to registry → verification succeeds
-- [ ] Remove issuer → verification fails
-- [ ] Cache works correctly
-- [ ] Handles chain unavailability
+- [x] Add issuer to registry → verification succeeds
+- [x] Remove issuer → verification fails
+- [x] Cache works correctly
+- [x] Handles chain unavailability
 
 ---
 
 ### M1.3 — OpenID4VCI Implementation (Days 12–15)
 
 #### Issuer Metadata (Per Spec)
-- [ ] Update `/.well-known/openid-credential-issuer`
-- [ ] `credential_issuer` - issuer URL
-- [ ] `credential_endpoint` - credential request URL
-- [ ] `credentials_supported` - list of credential types
-- [ ] `display` - issuer display info
+- [x] Update `/.well-known/openid-credential-issuer`
+- [x] `credential_issuer` - issuer URL
+- [x] `credential_endpoint` - credential request URL
+- [x] `credentials_supported` - list of credential types
+- [x] `display` - issuer display info
 
 #### Token Endpoint
-- [ ] Create `POST /token`
-- [ ] Accept pre-authorized code flow
-- [ ] Validate authorization
-- [ ] Return `access_token` with expiry
+- [x] Create `POST /token`
+- [x] Accept pre-authorized code flow
+- [x] Validate authorization
+- [x] Return `access_token` with expiry
 
 #### Credential Endpoint (Per Spec)
-- [ ] Update `POST /credential`
-- [ ] Accept `format`, `credential_definition`, `proof`
-- [ ] Validate access token
-- [ ] Validate proof JWT
-- [ ] Return credential in requested format
+- [x] Update `POST /credential`
+- [x] Accept `format`, `credential_definition`, `proof`
+- [x] Validate access token
+- [x] Validate proof JWT
+- [x] Return credential in requested format
 
 #### Wallet Integration
 - [ ] Update `CredentialHolder.ts` for OpenID4VCI
@@ -406,31 +406,31 @@
 - [ ] Handle credential response
 
 #### Testing
-- [ ] Validate against OpenID4VCI spec
-- [ ] Test with external validator tools
-- [ ] Full issuance flow works
+- [x] Validate against OpenID4VCI spec
+- [x] Test with external validator tools
+- [x] Full issuance flow works
 
 ---
 
 ### M1.4 — OpenID4VP Implementation (Days 15–18)
 
 #### Verifier Metadata (Per Spec)
-- [ ] Update `/.well-known/openid-verifier`
-- [ ] Supported presentation formats
-- [ ] Supported algorithms
-- [ ] Client metadata
+- [x] Update `/.well-known/openid-verifier`
+- [x] Supported presentation formats
+- [x] Supported algorithms
+- [x] Client metadata
 
 #### Authorization Endpoint
-- [ ] Create `GET /authorize`
-- [ ] Generate `presentation_definition`
-- [ ] Specify required credentials and claims
-- [ ] Return authorization request
+- [x] Create `GET /authorize`
+- [x] Generate `presentation_definition`
+- [x] Specify required credentials and claims
+- [x] Return authorization request
 
 #### Response Endpoint
-- [ ] Create `POST /callback`
-- [ ] Accept `vp_token` and `presentation_submission`
-- [ ] Validate per OpenID4VP spec
-- [ ] Return decision token (or `id_token` per spec)
+- [x] Create `POST /callback`
+- [x] Accept `vp_token` and `presentation_submission`
+- [x] Validate per OpenID4VP spec
+- [x] Return decision token (or `id_token` per spec)
 
 #### Wallet Integration
 - [ ] Update `PresentationCreator.ts` for OpenID4VP
@@ -446,9 +446,9 @@
 - [ ] Display consent before presenting
 
 #### Testing
-- [ ] Validate against OpenID4VP spec
-- [ ] Test claim filtering
-- [ ] Full verification flow works
+- [x] Validate against OpenID4VP spec
+- [x] Test claim filtering
+- [x] Full verification flow works
 
 ---
 

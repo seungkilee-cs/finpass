@@ -26,6 +26,8 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class IssuerService {
 
@@ -35,6 +37,7 @@ public class IssuerService {
 	private final CredentialRepository credentialRepository;
 	private final IssuanceRepository issuanceRepository;
 	private final IssuerKeyProvider keyProvider;
+	private final BlockchainService blockchainService;
 	private final String issuerDid;
 
 	public IssuerService(
@@ -42,13 +45,42 @@ public class IssuerService {
 			CredentialRepository credentialRepository,
 			IssuanceRepository issuanceRepository,
 			IssuerKeyProvider keyProvider,
+			BlockchainService blockchainService,
 			@Value("${issuer.did}") String issuerDid
 	) {
 		this.userRepository = userRepository;
 		this.credentialRepository = credentialRepository;
 		this.issuanceRepository = issuanceRepository;
 		this.keyProvider = keyProvider;
+		this.blockchainService = blockchainService;
 		this.issuerDid = issuerDid;
+	}
+
+	/**
+	 * Publish issuer DID to blockchain on startup if not already registered
+	 */
+	@PostConstruct
+	public void publishIssuerOnStartup() {
+		try {
+			// Check if issuer is already registered on-chain
+			if (!blockchainService.verifyIssuerOnChain(issuerDid)) {
+				// Get issuer public key in JWK format
+				String publicKeyJWK = keyProvider.getPublicKeyJWK();
+				
+				// Publish to blockchain
+				String txHash = blockchainService.publishIssuerKey(issuerDid, publicKeyJWK);
+				if (txHash != null) {
+					System.out.println("Published issuer DID to blockchain: " + issuerDid + " with tx: " + txHash);
+				} else {
+					System.out.println("Failed to publish issuer DID to blockchain: " + issuerDid);
+				}
+			} else {
+				System.out.println("Issuer DID already registered on-chain: " + issuerDid);
+			}
+		} catch (Exception e) {
+			System.err.println("Error publishing issuer DID to blockchain: " + e.getMessage());
+			// Don't fail startup - continue without blockchain registration
+		}
 	}
 
 	@Transactional

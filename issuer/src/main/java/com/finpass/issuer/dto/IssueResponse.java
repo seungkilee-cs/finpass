@@ -11,6 +11,13 @@ public class IssueResponse {
 	private String commitmentHash;
 	private String commitmentJwt;
 
+	// Constructors
+	public IssueResponse() {}
+	
+	public IssueResponse(String credentialJwt) {
+		this.credentialJwt = credentialJwt;
+	}
+
 	public UUID getCredId() {
 		return credId;
 	}

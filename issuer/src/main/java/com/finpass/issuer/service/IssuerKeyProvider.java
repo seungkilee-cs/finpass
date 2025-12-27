@@ -50,6 +50,10 @@ public class IssuerKeyProvider {
 		return signingKey.toPublicJWK().toJSONString();
 	}
 
+	public String getPublicKeyJWK() {
+		return exportPublicJwkJson();
+	}
+
 	private static OctetKeyPair loadOrGenerate(String privateJwk) {
 		if (privateJwk != null && !privateJwk.isBlank()) {
 			try {
